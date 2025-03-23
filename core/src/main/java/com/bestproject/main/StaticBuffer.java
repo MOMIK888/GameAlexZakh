@@ -202,7 +202,7 @@ public class StaticBuffer implements Disposable {
     public static void initialize_City_models(){
         current_enemies.clear();
         currentModels.clear();
-        String[] assets=new String[]{"Models/Buildings/building.g3dj","Models/Buildings/concreteTile.g3dj","Models/BluSlime/blueslime.g3dj","Models/Buildings/building.g3dj"
+        String[] assets=new String[]{"Models/Buildings/building.g3dj","Models/Buildings/concreteTile.g3dj","Models/BluSlime/blueslime.g3dj","Models/Buildings/bldg2.g3dj"
         };
         for(String i: assets){
             assetManager.load(i, Model.class);

@@ -53,13 +53,10 @@ public class CITY extends Map{
     public CITY(){
         StaticBuffer.initialize_City_models();
         StaticBuffer.LoadEffects();
-        columns=11;
-        rows=11;
+        columns=21;
+        rows=21;
         initialize();
         buildMap();
-        triggerZones.add(new Rectangle[]{new Rectangle(10,2,4,6)});
-        triggerZones.add(new Rectangle[]{});
-        triggerZones.add(new Rectangle[]{});
         addMoving(new Player(new Vector3(20f,0.30f,8f)));
         environment.add((shadowLight = new DirectionalShadowLight(1024, 1024, 40f, 40f, .1f, 50f))
             .set(1f, 1f, 1f, 40.0f, -35f, -35f));
@@ -105,7 +102,7 @@ public class CITY extends Map{
         }
     }
     public void buildMap(){
-        addMoving(new FlameBoss(new Vector3(10,0,10)));
+        addMoving(new FlameBoss(new Vector3(20,0,20)));
 
     }
     public static List<int[]> buildWalls(Array<Array<Tile>> grid) {
