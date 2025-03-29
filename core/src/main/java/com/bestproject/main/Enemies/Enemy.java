@@ -10,6 +10,7 @@ public class Enemy extends MovingObject {
     float speed=1f;
     public Enemy(ModelInstance model, Vector3 position) {
         super(model, position);
+        islIneArt=true;
     }
     @Override
     public int getType(){

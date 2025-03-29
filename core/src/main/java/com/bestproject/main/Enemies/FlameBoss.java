@@ -3,6 +3,7 @@ package com.bestproject.main.Enemies;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.math.MathUtils;
@@ -33,7 +34,7 @@ public class FlameBoss extends Enemy{
     float[] getDir;
     float Grab=0f;
     float rotationSpeed=1000f;
-    float rotation=45f;
+    float rotation=90f;
     float maxFrames=4f;
     int attackType=0;
     float cnt=0;
@@ -43,13 +44,20 @@ public class FlameBoss extends Enemy{
     BossAi ai=new BossAi();
     Vector3 target=new Vector3();
     Vector3 movement=new Vector3();
+    Model FlameRing;
     public FlameBoss (Vector3 position) {
         super(new ModelInstance(StaticBuffer.current_enemies.get(0)), position);
-        hitboxes=new HITBOX[]{new HITBOX(position.x, position.z, position.y, 0.25,0.25,1)};
+        StaticBuffer.assetManager.load("Models/Effects/fireRing.g3dj", Model.class);
+        StaticBuffer.assetManager.finishLoading();
+        position.y+=0.65f;
+        FlameRing=StaticBuffer.assetManager.get("Models/Effects/fireRing.g3dj");
+        hitboxes=new HITBOX[]{new HITBOX(position.x, position.z, position.y, 0.25,0.25,1.3)};
+        setPosition(position);
         setPosition(position);
         animationController=new AnimationController(modelInstance);
-        animationController.setAnimation("Armature|ArmatureAction",-1);
-        modelInstance.transform.scale(0.3f,0.3f,0.3f);
+        animationController.setAnimation("metarig|walk",-1);
+        modelInstance.transform.scale(0.06f,0.06f,0.06f);
+        modelInstance.transform.rotate(0f,1f,0f,180);
         speed=0.5f;
         realPosition.set(position);
     }
@@ -175,7 +183,7 @@ public class FlameBoss extends Enemy{
                     StaticBuffer.circularWarn.render(StaticBuffer.decalBatch);
                 } else {
                     isattacking = false;
-                    GameEngine.getGameCore().getMap().addMoving(new FlameRIng(new Vector3(position)));
+                    GameEngine.getGameCore().getMap().addMoving(new FlameRIng(FlameRing,new Vector3(position)));
                 }
             }
         }
@@ -216,7 +224,12 @@ public class FlameBoss extends Enemy{
     }
     @Override
     public boolean expire(){
-        return hp<=0;
+        if(hp<=0){
+            dispose();
+            return true;
+        }
+        return false;
+
     }
     @Override
     public void update(){
@@ -258,6 +271,6 @@ public class FlameBoss extends Enemy{
     }
     @Override
     public void dispose(){
-
+        FlameRing.dispose();
     }
 }

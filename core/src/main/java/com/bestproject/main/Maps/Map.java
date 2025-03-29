@@ -192,6 +192,9 @@ public class Map implements Disposable {
     public int[] getNearestObject(Vector3 coords,int[][] calc){
         return null;
     }
+    public Vector3 getNearestObjectCoordinates(Vector3 coords,int[][] calc){
+        return null;
+    }
     protected void setModelInstanceColor(MovingObject movingObject, Color color) {
         if(movingObject.getModelInstance()!=null){
         for (int i = 0; i < movingObject.getModelInstance().materials.size; i++) {

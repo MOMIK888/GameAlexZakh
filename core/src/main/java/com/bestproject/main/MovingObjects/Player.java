@@ -1,9 +1,11 @@
 package com.bestproject.main.MovingObjects;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
@@ -42,12 +44,13 @@ public class Player extends MovingObject{
     public Player(Vector3 position) {
         super(new ModelInstance(StaticBuffer.ui.getCurrentMoveset().getCharacterModel()), position);
         modelInstance.transform.setToRotation(0,1,0,90);
-        modelInstance.transform.scale(0.01f,0.01f,0.01f);
+        modelInstance.transform.scale(0.3f,0.3f,0.3f);
         hitboxes=new HITBOX[]{new HITBOX(position.x, position.z, position.y, 0.25,0.25,0.05f)};
         slideHitBox=new HITBOX(position.x, position.z, position.y, 0.45,0.45,1.1f);
         animationController=new AnimationController(modelInstance);
         animationController.setAnimation("metarig|idle",-1);
         setPosition(position);
+        islIneArt=true;
         StaticBuffer.setPlayer_coordinates(new int[]{(int) (position.z-1)/2,(int) (position.x-1)/2});
 
     }

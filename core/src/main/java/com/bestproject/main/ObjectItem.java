@@ -18,6 +18,7 @@ public class ObjectItem implements Disposable{
     public int shaderIndex=0;
     public ModelInstance modelInstance; //undisposable
     public Vector3 position;
+    protected boolean islIneArt=false;
     protected int unique_index;
 
     public ObjectItem (ModelInstance model, Vector3 position) {
@@ -32,6 +33,9 @@ public class ObjectItem implements Disposable{
         } else {
             System.gc();
         }
+    }
+    public boolean isIslIneArt(){
+        return  islIneArt;
     }
     public void update(){
 

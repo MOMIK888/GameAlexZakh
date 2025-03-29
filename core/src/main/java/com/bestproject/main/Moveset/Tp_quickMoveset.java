@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.bestproject.main.Attacks.Attack;
 import com.bestproject.main.Attacks.Blast;
+import com.bestproject.main.Attacks.Flintlock;
 import com.bestproject.main.Attacks.coinFling;
 import com.bestproject.main.CostumeClasses.ImageButton;
 import com.bestproject.main.Effects.Effect;
@@ -31,6 +32,8 @@ public class Tp_quickMoveset extends Moveset{
     coinFling coin=null; //disposed
     public boolean jump=false;
     public boolean dash;
+    public boolean isUlting=false;
+    Flintlock flintlock;
 
     public Tp_quickMoveset(){
         super();
@@ -42,9 +45,11 @@ public class Tp_quickMoveset extends Moveset{
         buttons.add(new ImageButton("Images/ButtonIcons/dash.png",2150,280,170,170));
         buttons.add(new ImageButton("Images/ButtonIcons/dash.png",2150,100,100,100));
         StaticBuffer.assetManager.load("Models/Attacks/blast.g3dj",Model.class);
-        StaticBuffer.assetManager.load("Models/Char1/char.g3dj", Model.class);
+        StaticBuffer.assetManager.load("Models/Char2/girl.g3dj", Model.class);
+        StaticBuffer.assetManager.load("Models/Minor_models/flintlock.g3dj", Model.class);
         StaticBuffer.assetManager.finishLoading();
-        characterModel=StaticBuffer.assetManager.get("Models/Char1/char.g3dj", Model.class);
+        flintlock=new Flintlock(new ModelInstance(StaticBuffer.assetManager.get("Models/Minor_models/flintlock.g3dj", Model.class)),new Vector3());
+        characterModel=StaticBuffer.assetManager.get("Models/Char2/girl.g3dj", Model.class);
         attacks.add(StaticBuffer.assetManager.get("Models/Attacks/blast.g3dj", Model.class));
         hp=100f;
         stamina=100;
@@ -146,6 +151,10 @@ public class Tp_quickMoveset extends Moveset{
                     simoltanious_buttons.add(act);
                     cd = 0.2f;
                     current_state=3;
+                    isUlting=true;
+                }
+                if(isUlting){
+                    simoltanious_buttons.add(act);
                 }
             } else if(act==1){
                 simoltanious_buttons.add(1);
@@ -169,13 +178,13 @@ public class Tp_quickMoveset extends Moveset{
         player.unnormalizedMovement.set(StaticQuickMAth.move(vec.x*deltatime*player.speed),0, StaticQuickMAth.move(-vec.y*deltatime*player.speed));
         float angle = vec.angle();
         float multiplier=1f;
-        player.hitboxes[0].setHeight(0.8f);
+        player.hitboxes[0].setHeight(1.4f);
         int current_state=player.current_state;
         if (!player.unnormalizedMovement.isZero() && StaticBuffer.ui.getState()!=4) {
             player.lastdir=player.lastdir.set(player.movement.x,0,player.movement.z);
-            if (current_state != 0 && StaticBuffer.ui.getState()==0) {
-                player.current_state = 0;
-                player.animationController.setAnimation("metarig|walking", -1);
+                if (current_state != 0 && StaticBuffer.ui.getState() == 0) {
+                    player.current_state = 0;
+                    player.animationController.setAnimation("metarig|walk", -1);
             }
             player.modelInstance.transform.rotate(0, 1, 0, angle - player.lastangle);
             player.lastangle = angle;
@@ -189,17 +198,24 @@ public class Tp_quickMoveset extends Moveset{
         if(StaticBuffer.ui.getState()==2){
             if(current_state!=2){
                 player.current_state=2;
-                player.animationController.setAnimation("metarig|clap", 1);
+                player.animationController.setAnimation("metarig|arms aross", 1);
             }
             multiplier=2f;
         }else if(StaticBuffer.ui.getState()==1){
             if(current_state!=3){
                 player.current_state=3;
-                player.animationController.setAnimation("metarig|shoot",1);
+                player.animationController.setAnimation("metarig|Shoot",1);
             }
         }else if (StaticBuffer.ui.getState()==4) {
             player.speed=4f;
-            player.hitboxes[0].setHeight(0.2f);
+            player.hitboxes[0].setHeight(0.1f);
+            player.modelInstance.transform.rotate(0, 1, 0, angle - player.lastangle);
+            player.lastangle = angle;
+            player.current_state=4;
+            player.animationController.setAnimation("metarig|slide",1);
+            StaticBuffer.dust.setPosition(new Vector3(StaticBuffer.getPlayerCooordinates()).add(new Vector3(0,0.3f,0)));
+            StaticBuffer.dust.update(StaticQuickMAth.move(GameCore.deltatime));
+            StaticBuffer.dust.render();
         }
         player.animationController.update(StaticQuickMAth.move(deltatime)*multiplier*player.speed);
         player.fractureMovement(player.movement);
@@ -239,7 +255,7 @@ public class Tp_quickMoveset extends Moveset{
 
     @Override
     public void goThrouh(){
-        if (simoltanious_buttons.contains(0) && isPunch) {
+        if (simoltanious_buttons.contains(0) && isPunch && !isUlting) {
             float[] sin_cos;
             if(StaticBuffer.ui.getIsLocked()) {
                 lock_omn_coordinates=GameEngine.getGameCore().getMap().tie_coordinates(lock_omn_coordinates,GameEngine.getGameCore().getMap().calculate_radius(2,new int[]{StaticBuffer.getPlayer_coordinates()[1],StaticBuffer.getPlayer_coordinates()[0]}));
@@ -258,18 +274,29 @@ public class Tp_quickMoveset extends Moveset{
             simoltanious_buttons.clear();
 
         } else if (isPunch && cooldowns[0]<=0){
-            if(!StaticBuffer.ui.getIsLocked()) {
-                lock_omn_coordinates=GameEngine.getGameCore().getMap().tie_coordinates(lock_omn_coordinates,GameEngine.getGameCore().getMap().calculate_radius(2,new int[]{StaticBuffer.getPlayer_coordinates()[1],StaticBuffer.getPlayer_coordinates()[0]} ));
+            if(!isUlting) {
+                if (!StaticBuffer.ui.getIsLocked()) {
+                    lock_omn_coordinates = GameEngine.getGameCore().getMap().tie_coordinates(lock_omn_coordinates, GameEngine.getGameCore().getMap().calculate_radius(2, new int[]{StaticBuffer.getPlayer_coordinates()[1], StaticBuffer.getPlayer_coordinates()[0]}));
+                }
+                float[] sin_cos = StaticBuffer.getSin_Cos(StaticBuffer.getPlayerCooordinates(), lock_omn_coordinates);
+                GameEngine.getGameCore().getMap().addMoving(new Blast(new ModelInstance(attacks.get(0)), StaticBuffer.getPlayerCooordinates(), sin_cos));
+                isPunch = false;
+                cooldowns[0] = 0.3f;
+                if (!StaticBuffer.ui.getIsLocked()) {
+                    lock_omn_coordinates = new Vector3();
+                }
+                simoltanious_buttons.clear();
+            } else{
+                isUlting=false;
+                flintlock.setExplosion(true);
+                flintlock.setPosition(StaticBuffer.getPlayerCooordinates());
+                GameEngine.getGameCore().getMap().addMoving(flintlock);
             }
-            float[] sin_cos=StaticBuffer.getSin_Cos(StaticBuffer.getPlayerCooordinates(),lock_omn_coordinates);
-            GameEngine.getGameCore().getMap().addMoving(new Blast(new ModelInstance(attacks.get(0)),StaticBuffer.getPlayerCooordinates(),sin_cos));
-            isPunch=false;
-            cooldowns[0]=0.3f;
-            if(!StaticBuffer.ui.getIsLocked()) {
-                lock_omn_coordinates=new Vector3();
-            }
-            simoltanious_buttons.clear();
         }else if (simoltanious_buttons.contains(0)) {
+            if(isUlting){
+                flintlock.rollCoin();
+                return;
+            }
             if(coin!=null){
                 return;
             }
