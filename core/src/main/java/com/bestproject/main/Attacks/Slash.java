@@ -1,12 +1,16 @@
 package com.bestproject.main.Attacks;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.decals.Decal;
+import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.bestproject.main.CostumeClasses.SpriteSheetDecal;
 import com.bestproject.main.CreativeMode.ShowHitbox;
 import com.bestproject.main.EffectDecals.FireEffect;
 import com.bestproject.main.Game.GameCore;
@@ -19,10 +23,14 @@ public class Slash extends Attack{
     float speed=4f;
     Vector3 sincos;
     ATKHITBOX[] hitboxes;
-    public Slash(Vector3 position, float[] flingdir) {
+    SpriteSheetDecal decal;
+    Decal deeeecal;
+    public Slash(Vector3 position, float[] flingdir, SpriteSheetDecal decal) {
         super(null, position);
         movement=new Vector3();
         sincos=new Vector3(flingdir);
+        deeeecal=Decal.newDecal(decal.getDecal().getTextureRegion(),true);
+        this.decal=decal;
         lengh=2f;
         hitboxes=new ATKHITBOX[]{new ATKHITBOX(position.x, position.z, position.y, 1f,0.2f,0.3f,1f,new float[]{10,10,10},false)};
         StaticQuickMAth.normalizeSpeed(sincos);
@@ -42,7 +50,8 @@ public class Slash extends Attack{
     }
     @Override
     public void render(ModelBatch batch, Environment environment){
-
+        deeeecal.setTextureRegion(decal.getDecal().getTextureRegion());
+        StaticBuffer.decalBatch.add(deeeecal);
     }
     @Override
     public void render(ModelBatch batch){
@@ -81,5 +90,12 @@ public class Slash extends Attack{
         lengh-=StaticQuickMAth.move(GameCore.deltatime);
         fractureMovement(new Vector3(StaticQuickMAth.move(sincos.x*speed* GameCore.deltatime),StaticQuickMAth.move(sincos.y*speed* GameCore.deltatime),StaticQuickMAth.move(sincos.z*speed* GameCore.deltatime)));
         hitboxes[0].width+=StaticQuickMAth.move(GameCore.deltatime*2);
+        decal.update(GameCore.deltatime);
+        deeeecal.setTextureRegion(decal.getDecal().getTextureRegion());
+        deeeecal.setPosition(this.position);
+        deeeecal.setDimensions((float) hitboxes[0].width, (float) hitboxes[0].thickness);
+        deeeecal.setRotation(0,0,0);
+        deeeecal.rotateX(90);
+        deeeecal.rotateZ(-45);
     }
 }

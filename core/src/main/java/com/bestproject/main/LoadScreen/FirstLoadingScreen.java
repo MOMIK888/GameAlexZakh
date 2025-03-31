@@ -25,7 +25,7 @@ public class FirstLoadingScreen extends LoadingScreen implements Screen {
         batch=new SpriteBatch();
         videoPlayer= VideoPlayerCreator.createVideoPlayer();
         videoPlayer.setLooping(true);
-        cdAnim=1f;
+        cdAnim=0.1f;
         shapeRenderer=new ShapeRenderer();
         try {
             videoPlayer.play(Gdx.files.internal("LoadingSC/raintown.ogv"));
@@ -50,8 +50,6 @@ public class FirstLoadingScreen extends LoadingScreen implements Screen {
             batch.begin();
             batch.draw(frame, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             batch.end();
-        } else{
-            System.out.println("NULLFRAME");
         }
         if(isLoaded){
             shapeRenderer.setAutoShapeType(true);

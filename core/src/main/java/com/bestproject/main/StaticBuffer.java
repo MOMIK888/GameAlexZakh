@@ -4,6 +4,9 @@ package com.bestproject.main;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes;
@@ -37,10 +40,13 @@ import com.bestproject.main.Game.GameEngine;
 import com.bestproject.main.LoadScreen.FirstLoadingScreen;
 import com.bestproject.main.LoadScreen.LoadingScreen;
 import com.bestproject.main.RenderOverride.RenderOverride;
+import com.bestproject.main.SoundManagement.CostumeSound;
+import com.bestproject.main.SoundManagement.SoundManager;
 
 import java.util.ArrayList;
 
 public class StaticBuffer implements Disposable {
+    public static SoundManager soundManager=new SoundManager();
     public static RenderOverride renderOverride=null;
     public static EffectBuffer effectBuffer=new EffectBuffer();
     public static SpriteSheetDecal warning=new SpriteSheetDecal(new Texture("Images/Effect2d/hit.png"),5,2,0.03f,0.01f); //disposed
@@ -121,6 +127,7 @@ public class StaticBuffer implements Disposable {
 
     }
     public static void disposeAll() {
+        soundManager.dispose();
         spriteBatch.dispose();
         TestShapeRenderer.dispose();
         warningRed.dispose();
@@ -205,6 +212,10 @@ public class StaticBuffer implements Disposable {
     }
     public static void initialize_City_models(){
         current_enemies.clear();
+        assetManager.load("Sounds/Music/song1.mp3", Music.class);
+        assetManager.finishLoading();
+        soundManager.addConstantSound("1x1x1x1x",new CostumeSound(assetManager.get("Sounds/Music/song1.mp3"), true, 20f));
+        soundManager.playSoundConstant("1x1x1x1x");
         currentModels.clear();
         String[] assets=new String[]{"Models/Buildings/building.g3dj","Models/Buildings/concreteTile.g3dj","Models/Char3/character3.g3dj","Models/Buildings/bldg2.g3dj"
         };

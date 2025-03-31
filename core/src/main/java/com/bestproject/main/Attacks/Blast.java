@@ -21,7 +21,7 @@ public class Blast extends Attack{
         sincos=flingdir.clone();
         animationController=new AnimationController(modelInstance);
         animationController.setAnimation("Armature|fly",-1);
-        modelInstance.transform.setToRotation(0f,1f,0f, (float) -Math.toDegrees(Math.atan2(flingdir[0],flingdir[1])));
+        modelInstance.transform.setToRotation(0f,1f,0f, (float) -Math.toDegrees(Math.atan2(flingdir[2],flingdir[0])));
         lengh=1f;
         modelInstance.transform.scale(0.002f,0.002f,0.002f);
         hitboxes=new ATKHITBOX[]{new ATKHITBOX(position.x, position.z, position.y, 0.1f,0.1f,0.2f,1f,new float[]{10,10,10},true)};
@@ -61,7 +61,7 @@ public class Blast extends Attack{
         if(hitboxes[0].getIsCol()){
             lengh=0;
         }
-        fractureMovement(new Vector3(StaticQuickMAth.move(sincos[1]*speed*GameCore.deltatime),0,StaticQuickMAth.move(sincos[0]*speed* GameCore.deltatime)));
+        fractureMovement(new Vector3(StaticQuickMAth.move(sincos[0]*speed*GameCore.deltatime),StaticQuickMAth.move(sincos[1]*speed*GameCore.deltatime),StaticQuickMAth.move(sincos[2]*speed* GameCore.deltatime)));
         animationController.update(StaticQuickMAth.move(GameEngine.getGameCore().deltatime));
     }
 }

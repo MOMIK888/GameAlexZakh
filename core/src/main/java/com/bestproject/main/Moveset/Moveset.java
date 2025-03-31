@@ -18,6 +18,7 @@ public class Moveset implements Disposable {
     protected float[] charge=new float[]{0,0};
     protected float stamina;
     protected float hp;
+    protected float maxHp;
     protected float critchance;
     protected float ability_cooldown;
     protected float critmultiplier;

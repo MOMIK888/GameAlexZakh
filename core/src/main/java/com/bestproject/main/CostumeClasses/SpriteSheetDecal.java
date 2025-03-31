@@ -30,6 +30,7 @@ public class SpriteSheetDecal implements Disposable {
         }
         decal = Decal.newDecal(frames[0], true);
     }
+    @Override
     public void dispose(){
     }
     public SpriteSheetDecal(Texture spriteSheet, int frameCols, int frameRows, float frameDuration, float scale) {
@@ -75,7 +76,11 @@ public class SpriteSheetDecal implements Disposable {
     }
     public void setStateTime(float time){
         stateTime=time;
-        update(0);
+        setFrame();
+    }
+    public void setFrame(){
+        currentFrame = ((int)(stateTime/frameDuration)) % frames.length;
+        decal.setTextureRegion(frames[currentFrame]);
     }
     public void setScale(float scale) {
         decal.setScale(scale);

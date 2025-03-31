@@ -57,6 +57,7 @@ public class Tp_quickMoveset extends Moveset{
         characterModel=StaticBuffer.assetManager.get("Models/Char2/girl.g3dj", Model.class);
         attacks.add(StaticBuffer.assetManager.get("Models/Attacks/blast.g3dj", Model.class));
         hp=100f;
+        maxHp=100f;
         stamina=100;
         Image_variations=new Texture[]{new Texture("Images/ButtonIcons/coinToss.png"), new Texture("Images/ButtonIcons/flintlock.png") };
 
@@ -125,6 +126,8 @@ public class Tp_quickMoveset extends Moveset{
         buttons.get(2).drawButton(shapeRenderer,buttons.get(2).bounds.x,buttons.get(2).bounds.y,buttons.get(2).getRadius()*2,buttons.get(2).getRadius()*2,buttons.get(2).getRadius(),colors[1],colors[0], charge[1]);
         buttons.get(3).drawButton(shapeRenderer,buttons.get(3).bounds.x,buttons.get(3).bounds.y,buttons.get(3).getRadius()*2,buttons.get(3).getRadius()*2,buttons.get(3).getRadius(),colors[1],colors[0],100f-cooldowns[1]*300f);
         buttons.get(4).drawButton(shapeRenderer,buttons.get(4).bounds.x,buttons.get(4).bounds.y,buttons.get(4).getRadius()*2,buttons.get(4).getRadius()*2,buttons.get(4).getRadius(),colors[1],colors[0],100f-cooldowns[3]*300f);
+        shapeRenderer.setColor(Color.GRAY);
+        shapeRenderer.rect(1000,80,maxHp*4,80);
         shapeRenderer.setColor(Color.GREEN);
         shapeRenderer.rect(1000,80,hp*4,80);
     }
@@ -294,8 +297,8 @@ public class Tp_quickMoveset extends Moveset{
                 if (!StaticBuffer.ui.getIsLocked()) {
                     lock_omn_coordinates = GameEngine.getGameCore().getMap().tie_coordinates(lock_omn_coordinates, GameEngine.getGameCore().getMap().calculate_radius(2, new int[]{StaticBuffer.getPlayer_coordinates()[1], StaticBuffer.getPlayer_coordinates()[0]}));
                 }
-                float[] sin_cos = StaticBuffer.getSin_Cos(StaticBuffer.getPlayerCooordinates(), lock_omn_coordinates);
-                GameEngine.getGameCore().getMap().addMoving(new Blast(new ModelInstance(attacks.get(0)), StaticBuffer.getPlayerCooordinates(), sin_cos));
+                float[] sin_cos = new float[]{-MathUtils.cosDeg(GameCore.cameraRoationm),-MathUtils.sinDeg(GameCore.cameraRoationm)};
+                GameEngine.getGameCore().getMap().addMoving(new Blast(new ModelInstance(attacks.get(0)), StaticBuffer.getPlayerCooordinates(), new float[]{sin_cos[1],-MathUtils.sinDeg(GameCore.cameraRoationX),sin_cos[0]}));
                 isPunch = false;
                 cooldowns[0] = 0.3f;
                 if (!StaticBuffer.ui.getIsLocked()) {

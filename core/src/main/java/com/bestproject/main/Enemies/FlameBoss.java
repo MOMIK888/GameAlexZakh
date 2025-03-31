@@ -16,6 +16,7 @@ import com.bestproject.main.Attacks.FlameRIng;
 import com.bestproject.main.Attacks.Slash;
 import com.bestproject.main.CameraUtils;
 import com.bestproject.main.CostumeClasses.Healthbar;
+import com.bestproject.main.CostumeClasses.SpriteSheetDecal;
 import com.bestproject.main.Game.GameCore;
 import com.bestproject.main.Game.GameEngine;
 import com.bestproject.main.MovingObjects.MovingObject;
@@ -46,6 +47,7 @@ public class FlameBoss extends Enemy{
     Vector3 movement=new Vector3();
     Model FlameRing;
     Healthbar healthbar;
+    SpriteSheetDecal spriteSheetDecal;
     public FlameBoss (Vector3 position) {
         super(new ModelInstance(StaticBuffer.current_enemies.get(0)), position);
         StaticBuffer.assetManager.load("Models/Effects/fireRing.g3dj", Model.class);
@@ -59,11 +61,12 @@ public class FlameBoss extends Enemy{
         animationController.setAnimation("metarig|walk",-1);
         modelInstance.transform.scale(0.06f,0.06f,0.06f);
         modelInstance.transform.rotate(0f,1f,0f,180);
-        speed=0.5f;
+        speed=2f;
         realPosition.set(position);
         Texture hb=new Texture("Images/Ui/hp.png");
         healthbar=new Healthbar(new TextureRegion(hb),new TextureRegion(hb),0.3f,0.05f,hp, Color.GREEN,Color.GREEN);
         healthbar.setPosition(position.x,position.y+1f,position.z);
+        spriteSheetDecal=new SpriteSheetDecal(new Texture("Images/Effect2d/fireSlashes.png"),4,4,0.1f);
     }
     @Override
     public void RenderHitboxes(){
@@ -207,7 +210,7 @@ public class FlameBoss extends Enemy{
             } else {
                 isattacking = false;
                 float angle= (float) Math.toRadians(StaticQuickMAth.getAngle(StaticBuffer.getPlayerCooordinates(),position));
-                GameEngine.getGameCore().getMap().addMoving(new Slash(position,new float[]{(float) -Math.cos(angle),0, (float) -Math.sin(angle)}));
+                GameEngine.getGameCore().getMap().addMoving(new Slash(position,new float[]{(float) -Math.cos(angle),0, (float) -Math.sin(angle)},spriteSheetDecal));
             }
         }
     }
@@ -244,6 +247,7 @@ public class FlameBoss extends Enemy{
     }
     @Override
     public void update(){
+        StaticBuffer.soundManager.update("1x1x1x1x",StaticBuffer.getPlayerCooordinates(),this.position);
         if(hp>0) {
             invinFrames -= StaticQuickMAth.move(GameEngine.getGameCore().getDeltatime());
             if(stunFrames<=0){
@@ -297,5 +301,6 @@ public class FlameBoss extends Enemy{
     @Override
     public void dispose(){
         FlameRing.dispose();
+        spriteSheetDecal.dispose();
     }
 }
