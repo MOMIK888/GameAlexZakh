@@ -9,9 +9,14 @@ import com.bestproject.main.StaticQuickMAth;
 public class BossAi extends AI{
     float attackCooldown=4f;
     int attack=0;
+    float UltCount=30;
     public void analyze(FlameBoss flameBoss) {
         if(attackCooldown<=0){
             attack= MathUtils.random(2);
+            if(UltCount<=0){
+                UltCount=30+MathUtils.random(0,20);
+                attack=-1;
+            }
             flameBoss.setAttack(attack);
 
             if(attack==0){
@@ -24,5 +29,6 @@ public class BossAi extends AI{
 
     public void update() {
         attackCooldown-= StaticQuickMAth.move(GameCore.deltatime);
+        UltCount-=StaticQuickMAth.move(GameCore.deltatime);
     }
 }

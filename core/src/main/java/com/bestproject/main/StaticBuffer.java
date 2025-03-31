@@ -31,14 +31,18 @@ import com.bestproject.main.CostumeClasses.GradientDecalWarning;
 import com.bestproject.main.CostumeClasses.SpriteSheetDecal;
 import com.bestproject.main.CostumeClasses.TextRendererController;
 import com.bestproject.main.CreativeMode.ShowHitbox;
+import com.bestproject.main.EffectDecals.EffectBuffer;
 import com.bestproject.main.Game.GameCore;
 import com.bestproject.main.Game.GameEngine;
 import com.bestproject.main.LoadScreen.FirstLoadingScreen;
 import com.bestproject.main.LoadScreen.LoadingScreen;
+import com.bestproject.main.RenderOverride.RenderOverride;
 
 import java.util.ArrayList;
 
 public class StaticBuffer implements Disposable {
+    public static RenderOverride renderOverride=null;
+    public static EffectBuffer effectBuffer=new EffectBuffer();
     public static SpriteSheetDecal warning=new SpriteSheetDecal(new Texture("Images/Effect2d/hit.png"),5,2,0.03f,0.01f); //disposed
     public static SpriteSheetDecal warningRed=new SpriteSheetDecal(new Texture("Images/Effect2d/redWarn.png"),4,4,0.03f,0.01f); //disposed
     public static SpriteSheetDecal dust=new SpriteSheetDecal(new Texture("Images/Effect2d/dust2.png"),8,5,0.005f,0.01f); //disposed

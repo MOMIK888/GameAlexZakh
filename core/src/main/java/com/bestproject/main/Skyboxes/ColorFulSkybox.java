@@ -21,11 +21,11 @@ public class ColorFulSkybox implements Disposable {
     private Texture skyboxTexture;
     public static ShaderProgram skyboxShader;
 
-    public ColorFulSkybox(String texturePath) {
-        StaticBuffer.assetManager.load("Models/Skyboxes/colorfulSkybox.g3dj", Model.class);
+    public ColorFulSkybox(String Path, String TexturePath, float size) {
+        StaticBuffer.assetManager.load(Path, Model.class);
         StaticBuffer.assetManager.finishLoading();
-        skybox =  StaticBuffer.assetManager.get("Models/Skyboxes/colorfulSkybox.g3dj",Model.class);
-        skyboxTexture=new Texture("Models/Skyboxes/fb56bd46-c7cc-46fd-953c-59ce09405460_scaled.jpg");
+        skybox =  StaticBuffer.assetManager.get(Path,Model.class);
+        skyboxTexture=new Texture(TexturePath);
         skyboxTexture.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
         skyboxShader = new ShaderProgram(
             Gdx.files.internal("shaders/skybox2.vert"),
@@ -34,9 +34,8 @@ public class ColorFulSkybox implements Disposable {
         if (!skyboxShader.isCompiled()) {
             Gdx.app.error("Skybox Shader", skyboxShader.getLog());
         }
-        skybox.meshes.get(0).scale(20,20,20);
+        skybox.meshes.get(0).scale(size,size,size);
         Matrix4 rotationMatrix=new Matrix4();
-        rotationMatrix=rotationMatrix.rotate(0f,1f,0f,90);
         skybox.meshes.get(0).transform(rotationMatrix);
     }
 

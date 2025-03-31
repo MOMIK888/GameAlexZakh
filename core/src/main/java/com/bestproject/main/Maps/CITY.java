@@ -203,7 +203,7 @@ public class CITY extends Map{
     }
     @Override
     protected void initialize(){
-        skybox=new ColorFulSkybox("");
+        skybox=new ColorFulSkybox("Models/Skyboxes/colorfulSkybox.g3dj","Models/Skyboxes/fb56bd46-c7cc-46fd-953c-59ce09405460_scaled.jpg",20);
         modelBatch=new ModelBatch();
         gridinit();
         environment = new Environment();
@@ -246,7 +246,6 @@ public class CITY extends Map{
             impactFrames-=delta;
             modelBatch.begin(camera);
             Gdx.gl.glEnable(GL20.GL_BLEND);
-            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             impact_frame(startColumn,endColumn,startRow,endRow);
             modelBatch.end();
             update(startColumn,endColumn,startRow,endRow);
@@ -301,10 +300,13 @@ public class CITY extends Map{
             Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
             Gdx.gl.glDepthMask(true);
             modelBatch.begin(camera);
-            draw(startColumn,endColumn,startRow,endColumn,modelBatch);
-            modelBatch.end();
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            if(StaticBuffer.renderOverride!=null){
+                StaticBuffer.renderOverride.Render(null,null);
+            }
+            draw(startColumn,endColumn,startRow,endColumn,modelBatch);
+            modelBatch.end();
             outlineShader.begin();
             depthBuffer.getTextureAttachments().get(0).bind(0);
             outlineShader.setUniformi("u_depthTexture", 0);
@@ -404,6 +406,9 @@ public class CITY extends Map{
                         staticObjects.get(i).get(j).get(m).render(modelBatch);
                     }
                 }
+                if(!staticRender){
+                    return;
+                }
                 for(int m = 0; m<movingObjects.get(i).get(j).size; m++) {
                     if(movingObjects.get(i).get(j).get(m).isIslIneArt()) {
                         movingObjects.get(i).get(j).get(m).render(modelBatch);
@@ -421,8 +426,10 @@ public class CITY extends Map{
                 if(Tiles.get(i).get(j)!=null){
                     modelBatch.render(Tiles.get(i).get(j).getModelInstance(), environment);
                 }
-                for(int m = 0; m<staticObjects.get(i).get(j).size; m++) {
-                    staticObjects.get(i).get(j).get(m).render(modelBatch,environment);
+                if(staticRender) {
+                    for (int m = 0; m < staticObjects.get(i).get(j).size; m++) {
+                        staticObjects.get(i).get(j).get(m).render(modelBatch, environment);
+                    }
                 }
                 for(int m = 0; m<movingObjects.get(i).get(j).size; m++) {
                     movingObjects.get(i).get(j).get(m).render(modelBatch,environment);

@@ -30,6 +30,10 @@ public class ImageButton implements Disposable {
         batch.setColor(1, 1, 1,alpha);
         batch.draw(image, bounds.x, bounds.y, bounds.width, bounds.height);
     }
+    public void draw(SpriteBatch batch, Texture texture, float alpha) {
+        batch.setColor(1, 1, 1,alpha);
+        batch.draw(texture, bounds.x, bounds.y, bounds.width, bounds.height);
+    }
     public float getRadius(){
         return bounds.width/2;
     }

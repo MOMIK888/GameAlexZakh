@@ -31,14 +31,16 @@ import java.util.List;
 
 public class Map implements Disposable {
     protected int rows, columns;
-    protected Array<Array<Array<MovingObject>>> movingObjects; //disposed
-    protected Array<Array<Array<StaticObject>>> staticObjects;
+    public Array<Array<Array<MovingObject>>> movingObjects; //disposed
+    public Array<Array<Array<StaticObject>>> staticObjects;
     protected Array<Array<Tile>> Tiles;//disposed
     protected boolean isImpactFraming=false;
     protected float impactFrames=0;
     protected ArrayList<int[]> impact_frames = new ArrayList<>();
     protected ModelBatch modelBatch;
     protected Environment environment;
+    public boolean staticRender=true;
+
     public Map(){
         initialize();
     }
@@ -96,6 +98,9 @@ public class Map implements Disposable {
     }
     public void update(int startColumn, int endColumn, int startRow, int endRow){
 
+    }
+    public void setStaticRender(boolean render){
+        this.staticRender=render;
     }
     public void render(PerspectiveCamera perspectiveCamera){
 

@@ -43,7 +43,7 @@ public class Healthbar {
         healthBarDecal.setColor(hpColor.r,hpColor.g,hpColor.b, 0.8f);
         Vector3 cameraDirection = GameCore.camera.direction.cpy();
         float yaw = (float) Math.atan2(cameraDirection.x, cameraDirection.z);
-        healthBarDecal.setRotationY(-yaw * MathUtils.radiansToDegrees);
+        healthBarDecal.setRotationY(yaw * MathUtils.radiansToDegrees);
         decalBatch.add(healthBarDecal);
     }
 

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Disposable;
 import com.bestproject.main.CostumeClasses.FPS;
 import com.bestproject.main.CostumeClasses.ImageButton;
@@ -29,6 +30,27 @@ public class UI implements Disposable {
         movesets.add(new Tp_quickMoveset());
         settingsButton=new ImageButton("Images/ButtonIcons/setting_button.png",0,970,120,120);
 
+    }
+    public void AnalyzeLms(){
+        ArrayList<Integer> aliveMovesets=new ArrayList<>();
+        for(int i=0; i<movesets.size(); i++){
+            if(movesets.get(i).getLMS()){
+                aliveMovesets.add(i);
+            }
+        }
+        if(aliveMovesets.size()==1){
+            movesets.get(aliveMovesets.get(0)).ActivateLms();
+            current_moveset=aliveMovesets.get(0);
+        } else if(aliveMovesets.size()>1){
+            Integer[] indexes=new Integer[aliveMovesets.size()];
+            aliveMovesets.toArray(indexes);
+            for(int i=0; i<indexes.length; i++){
+                indexes[i]-=current_moveset;
+                indexes[i]=Math.abs(indexes[i]);
+            }
+            int min=StaticQuickMAth.MinIndex(indexes);
+            current_moveset=min;
+        }
     }
     public void setCurrent_moveset(int index){
         current_moveset=index;

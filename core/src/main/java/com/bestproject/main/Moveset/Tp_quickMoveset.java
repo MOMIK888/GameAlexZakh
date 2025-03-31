@@ -3,6 +3,7 @@ package com.bestproject.main.Moveset;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -24,6 +25,7 @@ import com.bestproject.main.MovingObjects.MovingObject;
 import com.bestproject.main.MovingObjects.Player;
 import com.bestproject.main.StaticBuffer;
 import com.bestproject.main.StaticQuickMAth;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 
 import java.util.ArrayList;
 
@@ -34,6 +36,8 @@ public class Tp_quickMoveset extends Moveset{
     public boolean dash;
     public boolean isUlting=false;
     Flintlock flintlock;
+    Model FlintclockModel;
+    Texture[] Image_variations;
 
     public Tp_quickMoveset(){
         super();
@@ -48,11 +52,13 @@ public class Tp_quickMoveset extends Moveset{
         StaticBuffer.assetManager.load("Models/Char2/girl.g3dj", Model.class);
         StaticBuffer.assetManager.load("Models/Minor_models/flintlock.g3dj", Model.class);
         StaticBuffer.assetManager.finishLoading();
-        flintlock=new Flintlock(new ModelInstance(StaticBuffer.assetManager.get("Models/Minor_models/flintlock.g3dj", Model.class)),new Vector3());
+        FlintclockModel=StaticBuffer.assetManager.get("Models/Minor_models/flintlock.g3dj", Model.class);
+        flintlock=new Flintlock(FlintclockModel,new Vector3());
         characterModel=StaticBuffer.assetManager.get("Models/Char2/girl.g3dj", Model.class);
         attacks.add(StaticBuffer.assetManager.get("Models/Attacks/blast.g3dj", Model.class));
         hp=100f;
         stamina=100;
+        Image_variations=new Texture[]{new Texture("Images/ButtonIcons/coinToss.png"), new Texture("Images/ButtonIcons/flintlock.png") };
 
     }
 
@@ -60,6 +66,7 @@ public class Tp_quickMoveset extends Moveset{
     public void dispose() {
         super.dispose();
         coin.dispose();
+        FlintclockModel.dispose();
     }
 
     @Override
@@ -104,6 +111,10 @@ public class Tp_quickMoveset extends Moveset{
     public void draw(SpriteBatch spriteBatch){
         for(int i=0; i<buttons.size(); i++){
             buttons.get(i).draw(spriteBatch, 0.6f);
+        }
+        if(isUlting) {
+            StaticBuffer.fonts[0].getData().setScale(1f);
+            StaticBuffer.fonts[0].draw(spriteBatch, String.valueOf(flintlock.getChance()), buttons.get(2).getCenterX(), buttons.get(2).getCenterY());
         }
     }
 
@@ -217,6 +228,11 @@ public class Tp_quickMoveset extends Moveset{
             StaticBuffer.dust.update(StaticQuickMAth.move(GameCore.deltatime));
             StaticBuffer.dust.render();
         }
+        if(this.current_state==1){
+            if(!player.animationController.inAction){
+                this.current_state=0;
+            }
+        }
         player.animationController.update(StaticQuickMAth.move(deltatime)*multiplier*player.speed);
         player.fractureMovement(player.movement);
         player.movement.set(0,0,0);
@@ -295,6 +311,7 @@ public class Tp_quickMoveset extends Moveset{
         }else if (simoltanious_buttons.contains(0)) {
             if(isUlting){
                 flintlock.rollCoin();
+                simoltanious_buttons.clear();
                 return;
             }
             if(coin!=null){
@@ -313,5 +330,10 @@ public class Tp_quickMoveset extends Moveset{
         }
         simoltanious_buttons.clear();
         current_state=0;
+    }
+    @Override
+    public void ActivateLms(){
+        super.ActivateLms();
+        damageMultiplier=1.5f;
     }
 }

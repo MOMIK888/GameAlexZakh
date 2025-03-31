@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.bestproject.main.CreativeMode.ShowHitbox;
+import com.bestproject.main.EffectDecals.FireEffect;
 import com.bestproject.main.Game.GameCore;
 import com.bestproject.main.Game.GameEngine;
 import com.bestproject.main.ObjectFragment.ATKHITBOX;
@@ -23,11 +24,15 @@ public class Slash extends Attack{
         movement=new Vector3();
         sincos=new Vector3(flingdir);
         lengh=2f;
-        hitboxes=new ATKHITBOX[]{new ATKHITBOX(position.x, position.z, position.y, 1f,0.2f,0.3f,1f,new float[]{10,10,10},true)};
+        hitboxes=new ATKHITBOX[]{new ATKHITBOX(position.x, position.z, position.y, 1f,0.2f,0.3f,1f,new float[]{10,10,10},false)};
         StaticQuickMAth.normalizeSpeed(sincos);
         hitboxes[0].rotate(Math.toDegrees(Math.atan2(flingdir[0],flingdir[2])));
+        StaticBuffer.effectBuffer.addeffect(new FireEffect(lengh,this.position,1,40));
     }
     @Override
+    public int getRadius(){
+        return 3;
+    }
     public void setPosition(Vector3 position){
         this.position.set(position);
     }
@@ -74,7 +79,6 @@ public class Slash extends Attack{
     @Override
     public void update() {
         lengh-=StaticQuickMAth.move(GameCore.deltatime);
-        RenderHitboxes();
         fractureMovement(new Vector3(StaticQuickMAth.move(sincos.x*speed* GameCore.deltatime),StaticQuickMAth.move(sincos.y*speed* GameCore.deltatime),StaticQuickMAth.move(sincos.z*speed* GameCore.deltatime)));
         hitboxes[0].width+=StaticQuickMAth.move(GameCore.deltatime*2);
     }

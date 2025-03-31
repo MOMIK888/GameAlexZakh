@@ -70,6 +70,7 @@ public class GameCore implements Disposable, InputProcessor {
         Gdx.input.setInputProcessor(this);
         camera.rotate(90,0f,1f,0f);
         map=null;
+        StaticBuffer.effectBuffer.update();
         StaticBuffer.textRenderer.add(new FPS(StaticBuffer.fonts[0],"", Color.BLACK,Gdx.graphics.getWidth()-200,1000 ));
     }
     public boolean render() {
@@ -108,6 +109,7 @@ public class GameCore implements Disposable, InputProcessor {
         joystick.draw(shapeRenderer);
         shapeRenderer.end();
         StaticBuffer.ui.draw(StaticBuffer.spriteBatch, StaticBuffer.TestShapeRenderer);
+        StaticBuffer.effectBuffer.render(StaticBuffer.decalBatch);
         StaticBuffer.decalBatch.flush();
         return true;
     }

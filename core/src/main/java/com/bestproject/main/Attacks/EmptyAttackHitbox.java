@@ -11,10 +11,11 @@ import com.bestproject.main.StaticQuickMAth;
 
 public class EmptyAttackHitbox extends Attack{
     ATKHITBOX[] hbs;
-    public EmptyAttackHitbox(Vector3 position, float width, float height, float thickness, float pro, float invinFrames, float[] damage, boolean isenemy) {
+    public EmptyAttackHitbox(Vector3 position, float width, float height, float thickness, float pro, float invinFrames, float[] damage, boolean isenemy, float stunaframes) {
         super(null,position);
         lengh=pro;
         hbs=new ATKHITBOX[]{new ATKHITBOX(position.x,position.z,position.y,width,thickness,height,invinFrames,damage,isenemy)};
+        hbs[0].setStunframes(stunaframes);
     }
     @Override
     public ATKHITBOX[] getAtkHbs() {
@@ -27,6 +28,10 @@ public class EmptyAttackHitbox extends Attack{
 
     @Override
     public void render(ModelBatch modelBatch, Environment environment) {
+
+    }
+    @Override
+    public void render(ModelBatch modelBatch){
 
     }
     @Override

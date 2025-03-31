@@ -1,6 +1,7 @@
 package com.bestproject.main.Attacks;
 
 import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.MathUtils;
@@ -12,13 +13,14 @@ import com.bestproject.main.StaticQuickMAth;
 
 public class Flintlock extends Attack{
     public boolean isExplosion=false;
-    public boolean expired=true;
-    float flintlock=0.5f;
+    public boolean expired=false;
+    float flintlock=6f;
     float iterations=1;
     int chance=1;
     int result=-1;
-    public Flintlock(ModelInstance model, Vector3 position) {
-        super(model, position);
+    public Flintlock(Model model, Vector3 position) {
+        super(new ModelInstance(model), position);
+        modelInstance.transform.scale(0.001f,0.001f,0.001f);
     }
     @Override
     public void update(){
@@ -53,6 +55,7 @@ public class Flintlock extends Attack{
         } else{
             chance*=2;
         }
+        iterations+=1;
     }
     public void reset(){
         chance=1;
@@ -81,11 +84,11 @@ public class Flintlock extends Attack{
     }
     private void shoot(){
         Vector3 cords= GameEngine.getGameCore().getMap().getNearestObjectCoordinates(StaticBuffer.getPlayerCooordinates(),GameEngine.getGameCore().getMap().calculate_radius(5,new int[]{StaticBuffer.getPlayer_coordinates()[1],StaticBuffer.getPlayer_coordinates()[0]}));
-        GameEngine.getGameCore().getMap().addMoving(new EmptyAttackHitbox(cords,1,1,1,0.3f,1f,new float[]{20*(iterations*iterations),20*(iterations*iterations),20*(iterations*iterations)},true));
+        GameEngine.getGameCore().getMap().addMoving(new EmptyAttackHitbox(cords,1,1,1,0.3f,1f,new float[]{20*(iterations*iterations),20*(iterations*iterations),20*(iterations*iterations)},true,5f));
     }
     private void explode(){
         Vector3 cords= StaticBuffer.getPlayerCooordinates();
-        GameEngine.getGameCore().getMap().addMoving(new EmptyAttackHitbox(cords,1,1,1,0.3f,1f,new float[]{5*(iterations*iterations),5*(iterations*iterations),5*(iterations*iterations)},false));
+        GameEngine.getGameCore().getMap().addMoving(new EmptyAttackHitbox(cords,1,1,1,0.3f,1f,new float[]{5*(iterations*iterations),5*(iterations*iterations),5*(iterations*iterations)},false,0f));
     }
     private void didntWork(){
 

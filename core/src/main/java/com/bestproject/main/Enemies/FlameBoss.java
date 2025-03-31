@@ -45,6 +45,7 @@ public class FlameBoss extends Enemy{
     Vector3 target=new Vector3();
     Vector3 movement=new Vector3();
     Model FlameRing;
+    Healthbar healthbar;
     public FlameBoss (Vector3 position) {
         super(new ModelInstance(StaticBuffer.current_enemies.get(0)), position);
         StaticBuffer.assetManager.load("Models/Effects/fireRing.g3dj", Model.class);
@@ -60,6 +61,9 @@ public class FlameBoss extends Enemy{
         modelInstance.transform.rotate(0f,1f,0f,180);
         speed=0.5f;
         realPosition.set(position);
+        Texture hb=new Texture("Images/Ui/hp.png");
+        healthbar=new Healthbar(new TextureRegion(hb),new TextureRegion(hb),0.3f,0.05f,hp, Color.GREEN,Color.GREEN);
+        healthbar.setPosition(position.x,position.y+1f,position.z);
     }
     @Override
     public void RenderHitboxes(){
@@ -76,25 +80,29 @@ public class FlameBoss extends Enemy{
                             if (invinFrames * atkhitboxes[i].invincibility_resetter(unique_index) <= 0f) {
                                 hp -= (int) atkhitboxes[i].getSummDamage();
                                 invinFrames = atkhitboxes[i].getFrames();
+                                StaticBuffer.ui.getCurrentMoveset().chargeUlt( atkhitboxes[i].getSummDamage()/3f);
+                                float lasrstun=stunFrames;
                                 setStunFrames(atkhitboxes[i].getStun());
                                 atkhitboxes[i].invalidate(unique_index);
+                                if(stunFrames>1f && 0>= lasrstun){
+                                    animationController.setAnimation("metarig|knee fall",1);
+                                }
                                 if (hp <= 0) {
-                                    int angle = this.hitboxes[0].calculateAngle(atkhitboxes[i]);
-                                    getDir = new float[]{(float) Math.cos(angle), (float) Math.sin(angle)};
+
                                 }
                             }
                         } else if(atkhitboxes[i].getType()==1){
                             if (invinFrames * atkhitboxes[i].invincibility_resetter(unique_index) <= 0f) {
                                 hp -= (int) atkhitboxes[i].getSummDamage();
                                 invinFrames = atkhitboxes[i].getFrames();
+                                StaticBuffer.ui.getCurrentMoveset().chargeUlt( atkhitboxes[i].getSummDamage()/3f);
                                 setStunFrames(atkhitboxes[i].getStun());
                                 atkhitboxes[i].invalidate(unique_index);
                                 if(atkhitboxes[i].isParry() && this.atkhitboxes!=null){
                                     this.atkhitboxes=null;
                                 }
                                 if (hp <= 0) {
-                                    int angle = this.hitboxes[0].calculateAngle(atkhitboxes[i]);
-                                    getDir = new float[]{(float) Math.cos(angle), (float) Math.sin(angle)};
+
                                 }
                             }
 
@@ -133,7 +141,9 @@ public class FlameBoss extends Enemy{
             warningFrames=0.5f;
         } else if (attackType==1){
             warningFrames=0.5f;
-        } else{
+        } else if(attackType==-1){
+            warningFrames=0.5f;
+        }else{
             isattacking=false;
         }
     }
@@ -176,14 +186,14 @@ public class FlameBoss extends Enemy{
             } else{
                 if(TrailTime>=0){
                     TrailTime-=StaticQuickMAth.move(GameCore.deltatime);
-                    StaticBuffer.circularWarn.setPosition(position);
+                    StaticBuffer.circularWarn.setPosition(new Vector3(position).sub(new Vector3(0,0.5f,0)));
                     StaticBuffer.circularWarn.setScale(1,1);
                     StaticBuffer.circularWarn.setRotation(0);
                     StaticBuffer.circularWarn.setDimensions(7-(TrailTime*7*1.25f),7-(TrailTime*7*1.25f));
                     StaticBuffer.circularWarn.render(StaticBuffer.decalBatch);
                 } else {
                     isattacking = false;
-                    GameEngine.getGameCore().getMap().addMoving(new FlameRIng(FlameRing,new Vector3(position)));
+                    GameEngine.getGameCore().getMap().addMoving(new FlameRIng(FlameRing,new Vector3(position).sub(new Vector3(0,0.5f,0))));
                 }
             }
         }
@@ -196,8 +206,8 @@ public class FlameBoss extends Enemy{
                 StaticBuffer.warning.render();
             } else {
                 isattacking = false;
-                float angle=StaticQuickMAth.getAngle(position,StaticBuffer.getPlayerCooordinates());
-                GameEngine.getGameCore().getMap().addMoving(new Slash(position,new float[]{(float) Math.cos(angle),0, (float) Math.sin(angle)}));
+                float angle= (float) Math.toRadians(StaticQuickMAth.getAngle(StaticBuffer.getPlayerCooordinates(),position));
+                GameEngine.getGameCore().getMap().addMoving(new Slash(position,new float[]{(float) -Math.cos(angle),0, (float) -Math.sin(angle)}));
             }
         }
     }
@@ -221,6 +231,7 @@ public class FlameBoss extends Enemy{
     }
     @Override
     public void render(){
+        healthbar.render(StaticBuffer.decalBatch);
     }
     @Override
     public boolean expire(){
@@ -235,16 +246,30 @@ public class FlameBoss extends Enemy{
     public void update(){
         if(hp>0) {
             invinFrames -= StaticQuickMAth.move(GameEngine.getGameCore().getDeltatime());
-            animationController.update(StaticQuickMAth.move(GameEngine.getGameCore().getDeltatime()));
             if(stunFrames<=0){
+                animationController.update(StaticQuickMAth.move(GameEngine.getGameCore().getDeltatime()));
                 cnt+=StaticQuickMAth.move(GameEngine.getGameCore().deltatime);
                 ai();
             } else{
+
                 stunFrames-=StaticQuickMAth.move(GameEngine.getGameCore().deltatime);
+                if(stunFrames<0.6f) {
+                    animationController.update(StaticQuickMAth.move(-GameEngine.getGameCore().getDeltatime()));
+                }   else{
+                    animationController.update(StaticQuickMAth.move(GameEngine.getGameCore().getDeltatime()));
+                }
+                if(stunFrames<=0){
+                    animationController.setAnimation("metarig|walk",-1);
+                }
             }
 
         }
         movement.set(0,0,0);
+        healthbar.setPosition(this.position.x,this.position.y+1,this.position.z);
+        healthbar.setHp(hp);
+    }
+    private void DomainExpansion(){
+
     }
     @Override
     public void fractureMovement(Vector3 unnormalized_movement){

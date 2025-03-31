@@ -80,4 +80,7 @@ public class SpriteSheetDecal implements Disposable {
     public void setScale(float scale) {
         decal.setScale(scale);
     }
+    public float getDuration(){
+        return frameDuration*frames.length;
+    }
 }

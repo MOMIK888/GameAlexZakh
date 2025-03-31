@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.math.Vector3;
 import com.bestproject.main.Game.GameCore;
 import com.bestproject.main.Game.GameEngine;
+import com.bestproject.main.ObjectFragment.ATKHITBOX;
 import com.bestproject.main.StaticBuffer;
 import com.bestproject.main.StaticQuickMAth;
 import com.bestproject.main.StaticShaders;

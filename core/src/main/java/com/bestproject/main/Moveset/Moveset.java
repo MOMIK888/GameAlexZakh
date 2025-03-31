@@ -26,7 +26,9 @@ public class Moveset implements Disposable {
     protected int[][] Bitmap_button_coordinates;
     public float cd=0;
     protected Vector3 lock_omn_coordinates=new Vector3();
+    public float damageMultiplier=0f;
     boolean isPunch=false;
+    boolean lastManstanding=false;
     int current_state=0; //0-стачичный 1-Атака 2-Способность, 3-ульта 4-перекат
     public Moveset(){
         ability_cooldown=0;
@@ -46,6 +48,15 @@ public class Moveset implements Disposable {
         }
 
     }
+    public void ActivateLms(){
+        lastManstanding=true;
+    }
+    public void resetLMS(){
+        lastManstanding=false;
+    }
+    public boolean getLMS(){
+        return hp>0;
+    }
     public void PlayerInterrractions(Player player){
 
     }
@@ -57,6 +68,9 @@ public class Moveset implements Disposable {
     }
     public void update(){
 
+    }
+    public void chargeUlt(float value){
+        charge[1]+=value;
     }
     public boolean OnTouch(float touchX, float touchY, int pointer){
         return false;
