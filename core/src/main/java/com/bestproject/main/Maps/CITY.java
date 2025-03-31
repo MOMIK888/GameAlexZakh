@@ -70,6 +70,7 @@ public class CITY extends Map{
     FrameBuffer depthBuffer;
     ShaderProgram outlineShader;
 
+
     public CITY(){
         fullscreenMesh=createFullScreenQuad();
         depthBuffer=new FrameBuffer(Pixmap.Format.RGBA8888
