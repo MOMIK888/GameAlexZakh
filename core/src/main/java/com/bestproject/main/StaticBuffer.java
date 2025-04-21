@@ -33,12 +33,15 @@ import com.bestproject.main.CostumeClasses.CircularWarning;
 import com.bestproject.main.CostumeClasses.GradientDecalWarning;
 import com.bestproject.main.CostumeClasses.SpriteSheetDecal;
 import com.bestproject.main.CostumeClasses.TextRendererController;
+import com.bestproject.main.CreativeMode.CreativeMode;
 import com.bestproject.main.CreativeMode.ShowHitbox;
+import com.bestproject.main.Databases.DatabaseController;
 import com.bestproject.main.EffectDecals.EffectBuffer;
 import com.bestproject.main.Game.GameCore;
 import com.bestproject.main.Game.GameEngine;
 import com.bestproject.main.LoadScreen.FirstLoadingScreen;
 import com.bestproject.main.LoadScreen.LoadingScreen;
+import com.bestproject.main.Quests.QuestManager;
 import com.bestproject.main.RenderOverride.RenderOverride;
 import com.bestproject.main.SoundManagement.CostumeSound;
 import com.bestproject.main.SoundManagement.SoundManager;
@@ -46,6 +49,9 @@ import com.bestproject.main.SoundManagement.SoundManager;
 import java.util.ArrayList;
 
 public class StaticBuffer implements Disposable {
+    public static DatabaseController databaseController=new DatabaseController();
+    public static CreativeMode creativeMode=new CreativeMode();
+    public static QuestManager questManager=new QuestManager();
     public static SoundManager soundManager=new SoundManager();
     public static RenderOverride renderOverride=null;
     public static EffectBuffer effectBuffer=new EffectBuffer();
@@ -219,17 +225,8 @@ public class StaticBuffer implements Disposable {
         currentModels.clear();
         String[] assets=new String[]{"Models/Buildings/building.g3dj","Models/Buildings/concreteTile.g3dj","Models/Char3/character3.g3dj","Models/Buildings/bldg2.g3dj"
         };
-        for(String i: assets){
-            assetManager.load(i, Model.class);
-        }
-        assetManager.finishLoading();
         String[][] manager_of_assets=new String[][]{{"Models/Buildings/building.g3dj","Models/Buildings/concreteTile.g3dj","Models/Buildings/bldg2.g3dj"},{"Models/Char3/character3.g3dj"}};
-        for(String i: manager_of_assets[0]){
-            currentModels.add(assetManager.get(i));
-        }
-        for(String i: manager_of_assets[1]){
-            current_enemies.add(assetManager.get(i));
-        }
+        GameEngine.getGameCore().setLoadingScreen(new FirstLoadingScreen(assets,assetManager,manager_of_assets));
     }
     public static Rectangle loadTexture_plus_resize(float scale_on_x, float scale_on_y, boolean adaptx, int width, int height, int x, int y){
         return new Rectangle();

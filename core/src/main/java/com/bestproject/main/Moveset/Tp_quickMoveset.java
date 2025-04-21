@@ -41,7 +41,7 @@ public class Tp_quickMoveset extends Moveset{
 
     public Tp_quickMoveset(){
         super();
-
+        charinfo=3;
         colors=new Color[]{new Color(Color.rgba8888(0.4f, 0.2f, 0.6f,0.6f)),new Color(Color.rgba8888(0f, 0.8f, 1f,0.6f))};
         buttons.add(new ImageButton("Images/ButtonIcons/swap.png",1725,75,175,175));
         buttons.add(new ImageButton("Images/ButtonIcons/swap.png",1900,175,225,225));

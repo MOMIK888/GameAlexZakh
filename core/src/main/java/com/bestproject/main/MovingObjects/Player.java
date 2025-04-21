@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
@@ -27,12 +28,12 @@ public class Player extends MovingObject{
     public int current_state=0;
     public AnimationController animationController;
     public Vector3 unnormalizedMovement=new Vector3();
-    boolean isGravityAffected=true;
+    public boolean isGravityAffected=true;
     HITBOX slideHitBox;
     boolean[] climbing=new boolean[]{false,false};
     float jumped=0f;
     public float gravity_multip=1f;
-    Vector3 force=new Vector3();
+    public Vector3 force=new Vector3();
     boolean isSliding=false;
     public Vector3 offset=new Vector3();
 
@@ -52,6 +53,7 @@ public class Player extends MovingObject{
         setPosition(position);
         islIneArt=true;
         StaticBuffer.setPlayer_coordinates(new int[]{(int) (position.z-1)/2,(int) (position.x-1)/2});
+
 
     }
     public static void disposeAll() {
@@ -77,7 +79,7 @@ public class Player extends MovingObject{
     @Override
     public void update(){
         isSliding=false;
-        forceNullification();
+        StaticBuffer.ui.getCurrentMoveset().forceNullification(this);
         float glevel=GameEngine.getGameCore().getMap().GetGroundLevel(new Vector3((float) hitboxes[0].x, (float) hitboxes[0].z, (float) hitboxes[0].y));
         if(isGravityAffected && hitboxes[0].getBottom()>glevel){
             gravity_multip=1f;
@@ -119,79 +121,6 @@ public class Player extends MovingObject{
                 }
             }
         }
-    }
-    public void forceNullification(){
-        float glvevel=GameEngine.getGameCore().getMap().GetGroundLevel(new Vector3((float) hitboxes[0].x, (float) hitboxes[0].z, (float) hitboxes[0].y));
-
-        movement.add(force);
-        if(hitboxes[0].getBottom()>=glvevel) {
-            if (force.x > 0) {
-                force.x -= StaticQuickMAth.move(0.1f) * GameCore.deltatime/8;
-                if (force.x < 0) {
-                    force.x = 0;
-                }
-            } else {
-                force.x += StaticQuickMAth.move(0.1f) * GameCore.deltatime/8;
-                if (force.x > 0) {
-                    force.x = 0;
-                }
-            }
-            if (force.z > 0) {
-                force.z -= StaticQuickMAth.move(0.1f) * GameCore.deltatime/8;
-                if (force.z < 0) {
-                    force.z = 0;
-                }
-            } else {
-                force.z += StaticQuickMAth.move(0.1f) * GameCore.deltatime/8;
-                if (force.z > 0) {
-                    force.z = 0;
-                }
-            }
-            if (isGravityAffected) {
-                force.y -= StaticQuickMAth.getGravityAcceleration() * gravity_multip/2f/(Math.max(1,(Math.abs(movement.x)+Math.abs(movement.z))*50));
-            } else if (force.y < 0) {
-                force.y = 0;
-            }
-            if (force.y < -0.5f) {
-                force.y = -0.5f;
-            }
-            if(hitboxes[0].getBottom()<glvevel){
-                position.set(new Vector3(position.x, (float) (glvevel+(hitboxes[0].height/2.01f)), position.z));
-                gravity_multip=1f;
-            }
-        } else{
-            if (force.x > 0) {
-                force.x -= StaticQuickMAth.move(0.4f) * GameCore.deltatime;
-                if (force.x < 0) {
-                    force.x = 0;
-                }
-            } else {
-                force.x += StaticQuickMAth.move(0.4f) * GameCore.deltatime;
-                if (force.x > 0) {
-                    force.x = 0;
-                }
-            }
-            if (force.z > 0) {
-                force.z -= StaticQuickMAth.move(0.4f) * GameCore.deltatime;
-                if (force.z < 0) {
-                    force.z = 0;
-                }
-            } else {
-                force.z += StaticQuickMAth.move(0.4f) * GameCore.deltatime;
-                if (force.z > 0) {
-                    force.z = 0;
-                }
-            }
-            if(force.y<0){
-                force.y=0;
-            }
-            if(hitboxes[0].getBottom()<glvevel){
-                position.set(new Vector3(position.x, (float) (glvevel+(hitboxes[0].height/2.01f)), position.z));
-                gravity_multip=1f;
-            }
-        }
-
-
     }
     private void Climb(){
         float deltatime=GameEngine.gameCore.getDeltatime();

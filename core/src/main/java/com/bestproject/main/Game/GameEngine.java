@@ -13,6 +13,7 @@ import com.bestproject.main.Joystick;
 import com.bestproject.main.Maps.CITY;
 import com.bestproject.main.Maps.Dungeon;
 import com.bestproject.main.Maps.MapTest;
+import com.bestproject.main.Maps.Village;
 import com.bestproject.main.Skyboxes.Skybox;
 import com.bestproject.main.StaticQuickMAth;
 import com.bestproject.main.Tiles.StoneTile;
@@ -21,7 +22,7 @@ public class GameEngine implements Disposable {
     public static GameCore gameCore;
     public GameEngine(){
         gameCore=new GameCore();
-        gameCore.setMap(new CITY());
+        gameCore.setMap(new Village());
     }
     public void render(){
         gameCore.render();

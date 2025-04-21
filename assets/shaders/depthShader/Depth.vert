@@ -104,6 +104,6 @@ void main(){
         vec4 pos = u_projViewWorldTrans * vec4(a_position, 1.0);
     #endif
 
-    v_depth = (-pos.z-1.0) / 999.0;
+    v_depth = (-pos.z-1.0) / 1500.0;
     gl_Position = pos;
 }

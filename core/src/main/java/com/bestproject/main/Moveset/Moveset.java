@@ -1,22 +1,31 @@
 package com.bestproject.main.Moveset;
 
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
+import com.bestproject.main.CharacterUtils.FontConfig;
 import com.bestproject.main.CostumeClasses.ImageButton;
+import com.bestproject.main.Game.GameCore;
+import com.bestproject.main.Game.GameEngine;
 import com.bestproject.main.MovingObjects.Player;
+import com.bestproject.main.StaticBuffer;
+import com.bestproject.main.StaticQuickMAth;
 
 import java.util.ArrayList;
 
 public class Moveset implements Disposable {
+    protected int charinfo=0;
     protected Model characterModel;
     protected ArrayList<ImageButton> buttons; //disposed
     protected ArrayList<Integer> simoltanious_buttons;
     protected ArrayList<Model> attacks;
     protected float[] charge=new float[]{0,0};
     protected float stamina;
+    protected String MovesetName="moveset";
+    protected static FontConfig font=new FontConfig(StaticBuffer.fonts[0],1f,StaticBuffer.choice_colors[1]);
     protected float hp;
     protected float maxHp;
     protected float critchance;
@@ -37,6 +46,9 @@ public class Moveset implements Disposable {
         buttons=new ArrayList<>();
         simoltanious_buttons=new ArrayList<>();
         attacks=new ArrayList<>();
+    }
+    public void DrawMovesetWidget(ShapeRenderer shapeRenderer){
+
     }
     @Override
     public void dispose() {
@@ -91,6 +103,10 @@ public class Moveset implements Disposable {
     public void resetPointer(int pointer){
 
     }
+    public void updateInfo(){
+        String info=String.valueOf(hp) + "&" + String.valueOf(charge[1]);
+        StaticBuffer.databaseController.updateCharacterDb(charinfo,info);
+    }
     public void button_suggestion(int index){
         simoltanious_buttons.add(index);
     }
@@ -112,6 +128,9 @@ public class Moveset implements Disposable {
     protected void goThrouh(){
 
     }
+    protected void breakdown(){
+
+    }
     public boolean OnHold(){
         return false;
     }
@@ -125,4 +144,76 @@ public class Moveset implements Disposable {
     public int getCurrentState() {
         return current_state;
     }
+    public void forceNullification(Player player){
+        float glvevel= GameEngine.getGameCore().getMap().GetGroundLevel(new Vector3((float) player.hitboxes[0].x, (float) player.hitboxes[0].z, (float) player.hitboxes[0].y));
+
+        player.movement.add(player.force);
+        if(player.hitboxes[0].getBottom()>=glvevel) {
+            if (player.force.x > 0) {
+                player.force.x -= StaticQuickMAth.move(0.1f) * GameCore.deltatime/8;
+                if (player.force.x < 0) {
+                    player.force.x = 0;
+                }
+            } else {
+                player.force.x += StaticQuickMAth.move(0.1f) * GameCore.deltatime/8;
+                if (player.force.x > 0) {
+                    player.force.x = 0;
+                }
+            }
+            if (player.force.z > 0) {
+                player.force.z -= StaticQuickMAth.move(0.1f) * GameCore.deltatime/8;
+                if (player.force.z < 0) {
+                    player.force.z = 0;
+                }
+            } else {
+                player.force.z += StaticQuickMAth.move(0.1f) * GameCore.deltatime/8;
+                if (player.force.z > 0) {
+                    player.force.z = 0;
+                }
+            }
+            if (player.isGravityAffected) {
+                player.force.y -= StaticQuickMAth.getGravityAcceleration() * player.gravity_multip/2f/(Math.max(1,(Math.abs(player.movement.x)+Math.abs(player.movement.z))*50));
+            } else if (player.force.y < 0) {
+                player.force.y = 0;
+            }
+            if (player.force.y < -0.5f) {
+                player.force.y = -0.5f;
+            }
+            if(player.hitboxes[0].getBottom()<glvevel){
+                player.position.set(new Vector3(player.position.x, (float) (glvevel+(player.hitboxes[0].height/2.01f)), player.position.z));
+                player.gravity_multip=1f;
+            }
+        } else{
+            if (player.force.x > 0) {
+                player.force.x -= StaticQuickMAth.move(0.4f) * GameCore.deltatime;
+                if (player.force.x < 0) {
+                    player.force.x = 0;
+                }
+            } else {
+                player.force.x += StaticQuickMAth.move(0.4f) * GameCore.deltatime;
+                if (player.force.x > 0) {
+                    player.force.x = 0;
+                }
+            }
+            if (player.force.z > 0) {
+                player.force.z -= StaticQuickMAth.move(0.4f) * GameCore.deltatime;
+                if (player.force.z < 0) {
+                    player.force.z = 0;
+                }
+            } else {
+                player.force.z += StaticQuickMAth.move(0.4f) * GameCore.deltatime;
+                if (player.force.z > 0) {
+                    player.force.z = 0;
+                }
+            }
+            if(player.force.y<0){
+                player.force.y=0;
+            }
+            if(player.hitboxes[0].getBottom()<glvevel){
+                player.position.set(new Vector3(player.position.x, (float) (glvevel+(player.hitboxes[0].height/2.01f)), player.position.z));
+                player.gravity_multip=1f;
+            }
+        }
+    }
+
 }

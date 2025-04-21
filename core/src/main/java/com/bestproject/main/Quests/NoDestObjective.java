@@ -1,7 +1,7 @@
 package com.bestproject.main.Quests;
 
 public class NoDestObjective extends Objective{
-    public NoDestObjective(int[] kill, int[] collect, int[][] tasks, boolean iscompleted, int[] destination, int range) {
+    public NoDestObjective(int[] kill, int[] collect, int[][] tasks, boolean iscompleted, float[] destination, int range) {
         super(kill, collect, tasks, iscompleted, destination, range);
     }
 

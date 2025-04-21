@@ -32,6 +32,16 @@ public class HITBOX {
         this.height=height;
         this.rotation = 0.0;
     }
+    public void resize(float x, float y, float z){
+        this.width+=x;
+        this.thickness+=y;
+        this.height+=z;
+    }
+    public void move(float x, float y, float z){
+        this.x+=x;
+        this.y+=y;
+        this.z+=z;
+    }
     public void setType(int type){
         this.type=type;
     }

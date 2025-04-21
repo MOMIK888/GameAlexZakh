@@ -20,7 +20,6 @@ public class CostumeSound implements Disposable {
 
     public void play() {
         sound.play();
-        System.out.println(soundId + "SOUNDID");
     }
     public void update(Vector3 playerPosition, Vector3 soundPosition){
         if(isMuffled) {

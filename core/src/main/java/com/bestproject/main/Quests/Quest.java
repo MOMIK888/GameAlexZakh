@@ -3,6 +3,7 @@ package com.bestproject.main.Quests;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.bestproject.main.StaticBuffer;
 
@@ -21,7 +22,7 @@ public class Quest {
     public boolean getIscompleted(){
         return isCompleted;
     }
-    public void drawObjectives(){
+    public void drawObjectives(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer){
 
     }
     public void Complete_objectives(int kill, int collect, int[] tasks){
@@ -54,13 +55,13 @@ public class Quest {
         return Math.atan2(dy, dx);
     }
 
-    public  void drawCompass(ShapeRenderer shapeRenderer, double radians, int x, int y, int radius) {
-        int centerX =x;
-        int centerY=y;
+    public  void drawCompass(ShapeRenderer shapeRenderer, double radians, float x, float y, float radius) {
+        float centerX =x;
+        float centerY=y;
         Gdx.gl.glLineWidth(5);
         shapeRenderer.set(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.circle(centerX, centerY, radius);
         shapeRenderer.setColor(StaticBuffer.choice_colors[1]);
+        shapeRenderer.circle(centerX, centerY, radius);
         int endX = (int) (centerX + radius * Math.cos(radians));
         int endY = (int) (centerY + radius * Math.sin(radians));
         shapeRenderer.line(centerX, centerY, endX, endY);

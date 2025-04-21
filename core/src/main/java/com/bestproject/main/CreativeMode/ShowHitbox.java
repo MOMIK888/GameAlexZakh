@@ -1,22 +1,17 @@
 package com.bestproject.main.CreativeMode;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import com.bestproject.main.Game.GameCore;
 import com.bestproject.main.ObjectFragment.HITBOX;
 import com.bestproject.main.StaticBuffer;
-import com.bestproject.main.StaticQuickMAth;
 
 public class ShowHitbox {
-    HBRENDERER hbRenderer=new HBRENDERER();
+    public HBRENDERER hbRenderer=new HBRENDERER();
 
     public ShowHitbox() {
     }
@@ -140,13 +135,16 @@ class HBRENDERER implements Disposable {
     private Decal decal;
     private Texture gradientTexture;
     public HBRENDERER() {
-        gradientTexture = TextureUtils.createRedFrameTexture(64, 64);
-        decal = Decal.newDecal(new TextureRegion(gradientTexture), true);
+        setGradientTexture(TextureUtils.createRedFrameTexture(64, 64));
+        decal = Decal.newDecal(new TextureRegion(getGradientTexture()), true);
         decal.setPosition(0, 0, 0);
         decal.setScale(1f);
         Color col=decal.getColor();
         col.a=0.2f;
         decal.setColor(col);
+    }
+    public void setTint(int r, int g, int b){
+        decal.getColor().set(r,g,b,0.2f);
     }
     public void setDimensions(float scalex, float scaley){
         decal.setDimensions(scalex,scaley);
@@ -171,7 +169,7 @@ class HBRENDERER implements Disposable {
         decal.rotateZ(Rotation);
     }
     public void render(DecalBatch decalBatch) {
-        decal.setTextureRegion(new TextureRegion(gradientTexture));
+        decal.setTextureRegion(new TextureRegion(getGradientTexture()));
         decalBatch.add(decal);
     }
     public void setPosition(Vector3 pos){
@@ -180,9 +178,17 @@ class HBRENDERER implements Disposable {
 
     @Override
     public void dispose() {
-        gradientTexture.dispose();
+        getGradientTexture().dispose();
     }
     public void setGradientColors(Color startColor, Color endColor) {
+    }
+
+    public Texture getGradientTexture() {
+        return gradientTexture;
+    }
+
+    public void setGradientTexture(Texture gradientTexture) {
+        this.gradientTexture = gradientTexture;
     }
 }
 

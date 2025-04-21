@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.bestproject.main.CostumeClasses.FPS;
 import com.bestproject.main.CostumeClasses.ImageButton;
 import com.bestproject.main.Moveset.Moveset;
+import com.bestproject.main.Moveset.PizzaGuy;
 import com.bestproject.main.Moveset.Tp_quickMoveset;
 import com.bestproject.main.UiParts.Settins;
 
@@ -27,7 +28,7 @@ public class UI implements Disposable {
     public UI(){
         settins=new Settins();
         movesets=new ArrayList<>();
-        movesets.add(new Tp_quickMoveset());
+        movesets.add(new PizzaGuy());
         settingsButton=new ImageButton("Images/ButtonIcons/setting_button.png",0,970,120,120);
 
     }

@@ -57,7 +57,6 @@ public class GameCore implements Disposable, InputProcessor {
     Map map;
     public GameCore() {
         StaticShaders.init();
-        loadingScreen=new FirstLoadingScreen(new String[0], StaticBuffer.assetManager,new String[0][0]);
         shapeRenderer=new ShapeRenderer();
         joystick=new Joystick(150f,150f,160f);
         camera.translate(0,1f,0);
@@ -80,6 +79,7 @@ public class GameCore implements Disposable, InputProcessor {
             loadingScreen.DrawAssets();
             if(!StaticBuffer.isIsLoading()){
                 map.MapInitialization();
+                loadingScreen.dispose();
             }
             return false;
         }
@@ -100,6 +100,7 @@ public class GameCore implements Disposable, InputProcessor {
             Vector2 jval=joystick.getDIrectionCreative();
             newpos=newpos.add(pickRay.x*jval.y*deltatime*3,pickRay.y*jval.y*deltatime*3,pickRay.z*jval.y*deltatime*3);
             newpos=newpos.add(pickRay.z*jval.x*deltatime*3,0,pickRay.x*jval.x*deltatime*3);
+            StaticBuffer.creativeMode.draw();
             camera.position.set(newpos);
         } else{
             map.render(camera);
@@ -110,7 +111,6 @@ public class GameCore implements Disposable, InputProcessor {
         shapeRenderer.end();
         StaticBuffer.ui.draw(StaticBuffer.spriteBatch, StaticBuffer.TestShapeRenderer);
         StaticBuffer.effectBuffer.render(StaticBuffer.decalBatch);
-        StaticBuffer.decalBatch.flush();
         return true;
     }
     public void update(){
@@ -137,7 +137,7 @@ public class GameCore implements Disposable, InputProcessor {
         float[] values=cameraRotation.getAngles(cameraRotation.getVectors());
         values[0]*=-1;
         values[1]*=-1;
-        values[1]=MathUtils.clamp(values[1],-80-cameraRoationX,80-cameraRoationX);
+        values[1]=MathUtils.clamp(values[1],-90-cameraRoationX,90-cameraRoationX);
         cameraRoationm+=values[0];
         cameraRoationX+=values[1];
         additionalCooordinates.y-=0.5f;
@@ -177,7 +177,9 @@ public class GameCore implements Disposable, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-
+        if(StaticBuffer.isCreative){
+            StaticBuffer.creativeMode.onTouch(pointer,screenX,Gdx.graphics.getHeight()-screenY);
+        }
         if(joystick.contains(screenX,Screenheight-screenY)){
             joystick.update(screenX,Screenheight-screenY);
             joystick.setIndex(pointer);

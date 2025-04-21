@@ -32,7 +32,7 @@ import java.util.List;
 public class Map implements Disposable {
     protected int rows, columns;
     public Array<Array<Array<MovingObject>>> movingObjects; //disposed
-    public Array<Array<Array<StaticObject>>> staticObjects;
+    public Array<Array<Array<StaticObject>>> staticObjects; //disposed
     protected Array<Array<Tile>> Tiles;//disposed
     protected boolean isImpactFraming=false;
     protected float impactFrames=0;

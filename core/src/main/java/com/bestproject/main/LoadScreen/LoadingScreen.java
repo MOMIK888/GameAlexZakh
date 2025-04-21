@@ -33,19 +33,19 @@ public class LoadingScreen implements Disposable {
     }
     public void Update(AssetManager assetManager){
         float deltatime= Gdx.graphics.getDeltaTime();
-        assetManager.update((int)(deltatime*1000));
+        boolean isFinished=assetManager.update();
         if(!isLoaded && assets.length>0) {
-            if (assetManager.isFinished()) {
+            if (isFinished) {
                 currentindexingX += 1;
                 updateLoader(currentindexingX);
                 if (currentindexingX == assets.length) {
                     isLoaded=true;
                     assetManager.finishLoading();
                     for(String i: loadingMaterialsSorting[0]){
-                        StaticBuffer.currentModels.add(assetManager.get(i));
+                        StaticBuffer.currentModels.add(assetManager.get(i, Model.class));
                     }
                     for(String i : loadingMaterialsSorting[1]){
-                        StaticBuffer.current_enemies.add(assetManager.get(i));
+                        StaticBuffer.current_enemies.add(assetManager.get(i,Model.class));
                     }
                 } else{
                     assetManager.load(assets[currentindexingX],Model.class);

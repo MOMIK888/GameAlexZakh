@@ -70,6 +70,8 @@ public class CITY extends Map{
     ModelBatch depthModelBatch;
     FrameBuffer depthBuffer;
     ShaderProgram outlineShader;
+    ShaderProgram toonShader;
+    DirectionalLight directionalLight;
 
     public CITY(){
         fullscreenMesh=createFullScreenQuad();
@@ -83,25 +85,31 @@ public class CITY extends Map{
             , Gdx.graphics.getWidth()
             , Gdx.graphics.getHeight()
             , true);
+        toonShader=new ShaderProgram(Gdx.files.internal("shaders/toon/toon.vert").readString()
+            , Gdx.files.internal("shaders/toon/toon.frag").readString());
         outlineShader=new ShaderProgram(Gdx.files.internal("shaders/Outline/outline.frag").readString()
             , Gdx.files.internal("shaders/Outline/outline.vert").readString());
         StaticBuffer.initialize_City_models();
         StaticBuffer.LoadEffects();
-        columns=21;
-        rows=21;
-        initialize();
-        buildMap();
-        addMoving(new Player(new Vector3(20f,0.30f,8f)));
+        columns=50;
+        rows=50;
         environment.add((shadowLight = new DirectionalShadowLight(1024, 1024, 40f, 40f, 1f, 30f))
             .set(1f, 1f, 1f, 40.0f, -55f, -55f));
         environment.shadowMap = shadowLight;
         frameBuffer.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
-        modelBatch=new ModelBatch(new DefaultShaderProvider());
-
 
 
         shadowBatch = new ModelBatch(new DepthShaderProvider());
+
+    }
+    @Override
+    public void MapInitialization(){
+        initialize();
+        buildMap();
+        addMoving(new Player(new Vector3(20f,0.30f,8f)));
+        directionalLight=new DirectionalLight().set(0.4f, 0.4f, 0.4f, -1f, -0f, -0f);
+        environment.add(directionalLight);
 
     }
     public void setPlayer_coordinates(int coord1, int coord2){
@@ -119,7 +127,7 @@ public class CITY extends Map{
             for (int col = 0; col < columns; col++) {
                 staticObjects.get(row).add(new Array<StaticObject>());
                 movingObjects.get(row).add(new Array<MovingObject>());
-                Tiles.get(row).add(new ConcreteTile(new Vector3(2*row,0,2*col)));
+                Tiles.get(row).add(null);
             }
         }
     }
@@ -208,8 +216,10 @@ public class CITY extends Map{
         modelBatch=new ModelBatch();
         gridinit();
         environment = new Environment();
-        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.3f, 0.3f, 0.3f, 0f));
-        environment.add((new DirectionalLight().set(0.2f, 0.2f, 0.2f, -1f, -0f, -0f)));
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.5f, 0.5f, 0.5f, 0f));
+        directionalLight.color.set(
+            Color.valueOf("FFA500")
+        );
     }
     @Override
     public void update(int startColumn, int endColumn, int startRow, int endRow){
@@ -277,7 +287,6 @@ public class CITY extends Map{
                 impact_frames.clear();
             }
         } else{
-            drawShadows(camera,startColumn,endColumn,startRow,endRow);
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
@@ -296,18 +305,28 @@ public class CITY extends Map{
             }
             depthBuffer.end();
 
+                Gdx.gl.glCullFace(GL20.GL_BACK);
+                Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+                Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
+                Gdx.gl.glDepthMask(true);
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT
+                    | GL20.GL_DEPTH_BUFFER_BIT);
+                skybox.render(camera);
+            drawShadows(camera,startColumn,endColumn,startRow,endRow);
+                modelBatch.begin(camera);
+                Gdx.gl.glEnable(GL20.GL_BLEND);
+                Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                if(StaticBuffer.renderOverride!=null){
+                    StaticBuffer.renderOverride.Render(null,null);
+                }
+                draw(startColumn,endColumn,startRow,endColumn,modelBatch);
+                modelBatch.end();
+
+            }
             Gdx.gl.glCullFace(GL20.GL_BACK);
             Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
             Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
             Gdx.gl.glDepthMask(true);
-            modelBatch.begin(camera);
-            Gdx.gl.glEnable(GL20.GL_BLEND);
-            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-            if(StaticBuffer.renderOverride!=null){
-                StaticBuffer.renderOverride.Render(null,null);
-            }
-            draw(startColumn,endColumn,startRow,endColumn,modelBatch);
-            modelBatch.end();
             outlineShader.begin();
             depthBuffer.getTextureAttachments().get(0).bind(0);
             outlineShader.setUniformi("u_depthTexture", 0);
@@ -315,21 +334,19 @@ public class CITY extends Map{
             fullscreenMesh.render(outlineShader,GL20.GL_TRIANGLES);
             outlineShader.end();
             update(startColumn,endColumn,startRow,endRow);
-        }
 
     }
     public Mesh createFullScreenQuad() {
         float[] verts = new float[]{
-            // X,    Y,    Z,   U,  V
-            -1.f, -1.f,  0.f,  0.f, 0.f,  // Bottom-left  (0)
-            1.f, -1.f,  0.f,  1.f, 0.f,  // Bottom-right (1)
-            1.f,  1.f,  0.f,  1.f, 1.f,  // Top-right    (2)
-            -1.f,  1.f,  0.f,  0.f, 1.f   // Top-left     (3)
+            -1.f, -1.f,  0.f,  0.f, 0.f,
+            1.f, -1.f,  0.f,  1.f, 0.f,
+            1.f,  1.f,  0.f,  1.f, 1.f,
+            -1.f,  1.f,  0.f,  0.f, 1.f
         };
 
         short[] indices = new short[]{
-            0, 1, 2, // First triangle
-            2, 3, 0  // Second triangle
+            0, 1, 2,
+            2, 3, 0
         };
 
         Mesh tmpMesh = new Mesh(true, 4, 6,
@@ -343,8 +360,8 @@ public class CITY extends Map{
     }
 
     public void drawShadows(PerspectiveCamera camera,int startColumn,int endColumn,int startRow,int endRow){
-        shadowLight.begin(Vector3.Zero, camera.direction);
-        shadowBatch.begin(shadowLight.getCamera());
+        shadowLight.begin(StaticBuffer.getPlayerCooordinates(), camera.direction);
+        shadowBatch.begin(camera);
         for (int i = startRow; i <= endRow; i++) {
             for (int j = startColumn; j <= endColumn; j++) {
                 for(int m = 0; m<movingObjects.get(i).get(j).size; m++) {
@@ -373,6 +390,7 @@ public class CITY extends Map{
         depthBuffer.dispose();
         depthModelBatch.dispose();
         skybox.dispose();
+
         fullscreenMesh.dispose();
         frameBuffer.dispose();
         shadowLight.dispose();
@@ -413,7 +431,6 @@ public class CITY extends Map{
                 for(int m = 0; m<movingObjects.get(i).get(j).size; m++) {
                     if(movingObjects.get(i).get(j).get(m).isIslIneArt()) {
                         movingObjects.get(i).get(j).get(m).render(modelBatch);
-                        movingObjects.get(i).get(j).get(m).render();
                     }
                 }
             }

@@ -1,9 +1,13 @@
 package com.bestproject.main;
 
+import com.artemis.EntitySystem;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Pool;
 import com.bestproject.main.Game.GameCore;
 import com.bestproject.main.Game.GameEngine;
 
@@ -12,7 +16,9 @@ public class StaticQuickMAth {
     public static float time=0f;
     public static float counter;
     public static float gravityConstant=1.3f;
+    public static float TrueGravity=-9.84f;
     public static float distance(float[] point1, float[] point2){
+
         float sum = 0.0f;
         for (int i = 0; i < point1.length; i++) {
             float diff = point1[i] - point2[i];
@@ -123,5 +129,8 @@ public class StaticQuickMAth {
             }
         }
         return minIndex;
+    }
+    public static Vector3 getMultipVec(Vector3 vector, float value){
+        return new Vector3(vector.x*value,vector.y*value,vector.z*value);
     }
 }

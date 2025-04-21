@@ -22,6 +22,7 @@ public class Slashing extends Moveset{
     Color[] colors; //undisposable
     public Slashing(){
         super();
+        charinfo=2;
         colors=new Color[]{new Color(Color.rgba8888(0f, 239f/255f, 1f,0.6f)),new Color(Color.rgba8888(14f/255f, 80f/255f, 233f/255f,0.6f))};
         buttons.add(new ImageButton("Images/ButtonIcons/swap.png",1725,75,175,175));
         buttons.add(new ImageButton("Images/ButtonIcons/swap.png",1900,175,225,225));

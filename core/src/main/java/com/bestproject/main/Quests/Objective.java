@@ -5,12 +5,12 @@ public class Objective {
     int[] collect;
     int[][] tasks;
     boolean iscompleted=false;
-    int[] destination;
+    float[] destination;
     int takamount=3;
     float range;
     String task_name="";
 
-    public Objective(int[] kill, int[] collect, int[][] tasks, boolean iscompleted, int[] destination, float range) {
+    public Objective(int[] kill, int[] collect, int[][] tasks, boolean iscompleted, float[] destination, float range) {
         this.kill = kill;
         this.collect = collect;
         this.tasks = tasks;
@@ -89,7 +89,7 @@ public class Objective {
     public boolean getIscompleted(){
         return iscompleted;
     }
-    public int[] getDestination(){
+    public float[] getDestination(){
         return  destination;
     }
     public int[] getKill(){

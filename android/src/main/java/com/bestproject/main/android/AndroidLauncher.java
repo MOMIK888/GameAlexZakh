@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.bestproject.main.Game.DatabaseInterface;
 import com.bestproject.main.Main;
 import com.bestproject.main.MainGame;
 
@@ -14,6 +15,6 @@ public class AndroidLauncher extends AndroidApplication {
         super.onCreate(savedInstanceState);
         AndroidApplicationConfiguration configuration = new AndroidApplicationConfiguration();
         configuration.useImmersiveMode = true;
-        initialize(new MainGame(), configuration);
+        initialize(new MainGame(null), configuration);
     }
 }

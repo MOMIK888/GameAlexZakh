@@ -17,6 +17,17 @@ public class TextureUtils {
         pixmap.dispose();
         return texture;
     }
+    public static Texture createBlueFrameTexture(int width, int height) {
+        Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        pixmap.setColor(0, 0, 1, 1);
+        pixmap.fillRectangle(0, 0, width, 2);
+        pixmap.fillRectangle(0, height - 2, width, 2);
+        pixmap.fillRectangle(0, 0, 2, height);
+        pixmap.fillRectangle(width - 2, 0, 2, height);
+        Texture texture = new Texture(pixmap);
+        pixmap.dispose();
+        return texture;
+    }
     public static Texture createCirCleTexture(int width, int height, Color color) {
         Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
         pixmap.setColor(color);
