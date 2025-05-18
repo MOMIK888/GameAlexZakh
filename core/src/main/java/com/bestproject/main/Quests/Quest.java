@@ -5,8 +5,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.bestproject.main.MainGame;
 import com.bestproject.main.StaticBuffer;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Quest {
@@ -14,8 +16,9 @@ public class Quest {
     int current_objective=0;
     String name="";
     int unique_index;
-    boolean is_dest=false;
+    boolean is_dest=true;
     boolean isCompleted=false;
+    boolean is_init=false;
     public Quest(){
 
     }
@@ -25,14 +28,25 @@ public class Quest {
     public void drawObjectives(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer){
 
     }
+    public int getIndex(){
+        return -1;
+    }
+    public void initialize(ArrayList<Objective> objectiveArray, String name, int unique_index){
+        this.name=name;
+        this.objectives=objectiveArray;
+        this.unique_index=unique_index;
+        is_init=true;
+    }
     public void Complete_objectives(int kill, int collect, int[] tasks){
-        if(is_dest){
-            objectives.get(current_objective).setComplete(kill,collect,tasks,true);
-            if(objectives.get(current_objective).getIscompleted()){
-                if(current_objective<objectives.size()-1){
-                    current_objective+=1;
-                } else{
-                    isCompleted=true;
+        if(!objectives.isEmpty()) {
+            if (is_dest) {
+                objectives.get(current_objective).setComplete(kill, collect, tasks, true);
+                if (objectives.get(current_objective).getIscompleted()) {
+                    if (current_objective < objectives.size() - 1) {
+                        current_objective += 1;
+                    } else {
+                        isCompleted = true;
+                    }
                 }
             }
         }
@@ -55,7 +69,7 @@ public class Quest {
         return Math.atan2(dy, dx);
     }
 
-    public  void drawCompass(ShapeRenderer shapeRenderer, double radians, float x, float y, float radius) {
+    public static void drawCompass(ShapeRenderer shapeRenderer, double radians, float x, float y, float radius) {
         float centerX =x;
         float centerY=y;
         Gdx.gl.glLineWidth(5);
@@ -67,7 +81,7 @@ public class Quest {
         shapeRenderer.line(centerX, centerY, endX, endY);
     }
     public void getRewards(){
-
+        MainGame.databaseInterface[1].setInfo(getIndex(),"1");
     }
 }
 

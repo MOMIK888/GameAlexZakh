@@ -8,25 +8,30 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.bestproject.main.StaticBuffer;
 
 public class CharacterWidget {
-    public static Color[] colors;
+    public static Color color;
     public Texture characterSprite;
     public CharacterWidget(Texture texture){
         this.characterSprite=texture;
+        color=new Color(StaticBuffer.choice_colors[0]);
+        color.a=0.5f;
     }
-    public void draw(ShapeRenderer shapeRenderer, int num, int colornum ){
+    public void draw(ShapeRenderer shapeRenderer, int num, int totalMovesets){
         float w,x,y;
         w=100* StaticBuffer.getScaleX();
         x=StaticBuffer.screenWidth-200*StaticBuffer.getScaleX();
-        y=StaticBuffer.screenHeight+StaticBuffer.getScaleY()*100*num;
-        shapeRenderer.setColor(colors[colornum]);
+        y=StaticBuffer.screenHeight/2+StaticBuffer.getScaleY()*200+StaticBuffer.getScaleY()*100*num-StaticBuffer.getScaleY()*((float) (totalMovesets-1)/2)*100;
+        shapeRenderer.setColor(color);
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.rect(x,y,300*StaticBuffer.getScaleX(),w);
     }
     public void draw(SpriteBatch spriteBatch, int num){
-        float w,x,y;
-        w=100* StaticBuffer.getScaleX();
-        x=StaticBuffer.screenWidth-250*StaticBuffer.getScaleX();
-        y=StaticBuffer.screenHeight+StaticBuffer.getScaleY()*100*num;
-        spriteBatch.draw(characterSprite,x,y,w,w);
+        if(characterSprite!=null) {
+            float w, x, y;
+            w = 100 * StaticBuffer.getScaleX();
+            x = StaticBuffer.screenWidth - 250 * StaticBuffer.getScaleX();
+            y = StaticBuffer.screenHeight + StaticBuffer.getScaleY() * 100 * num;
+            spriteBatch.draw(characterSprite, x, y, w, w);
+        }
     }
+    public void OnTouch(){}
 }

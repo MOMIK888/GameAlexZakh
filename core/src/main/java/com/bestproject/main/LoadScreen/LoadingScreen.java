@@ -19,6 +19,7 @@ public class LoadingScreen implements Disposable {
     protected int NumberOfAssets;
     protected float cdAnim=1f;
     public LoadingScreen(String[] assets, AssetManager assetManager, String[][] materials){
+        assetManager.clear();
         StaticBuffer.setIsLoading(true);
         this.assets=assets.clone();
         if(assets.length>0){
@@ -60,6 +61,19 @@ public class LoadingScreen implements Disposable {
     }
     protected void updateLoader(int progress){
 
+    }
+    public void recompile(String[] assets, AssetManager assetManager, String[][] materials){
+        assetManager.clear();
+        currentindexingX=0;
+        isLoaded=false;
+        cdAnim=1f;
+        StaticBuffer.setIsLoading(true);
+        this.assets=assets.clone();
+        if(assets.length>0){
+            assetManager.load(assets[currentindexingX], Model.class);
+        }
+        NumberOfAssets=assets.length;
+        loadingMaterialsSorting=materials;
     }
 
     @Override

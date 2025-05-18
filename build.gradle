@@ -1,6 +1,7 @@
 buildscript {
   repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
     maven { url 'https://s01.oss.sonatype.org' }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/com/badlogicgames/gdx-video/"}
@@ -69,7 +70,9 @@ subprojects {
   repositories {
     mavenCentral()
     maven { url 'https://s01.oss.sonatype.org' }
+    maven { url 'https://jitpack.io' }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/com/badlogicgames/gdx-video/"}
     // You may want to remove the following line if you have errors downloading dependencies.
     mavenLocal()

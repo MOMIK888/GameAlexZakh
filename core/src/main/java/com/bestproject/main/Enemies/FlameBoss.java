@@ -55,7 +55,7 @@ public class FlameBoss extends Enemy{
         StaticBuffer.assetManager.finishLoading();
         position.y+=0.65f;
         FlameRing=StaticBuffer.assetManager.get("Models/Effects/fireRing.g3dj");
-        hitboxes=new HITBOX[]{new HITBOX(position.x, position.z, position.y, 0.25,0.25,1.3)};
+        hitboxes=new HITBOX[]{new HITBOX(position.x, position.z, position.y, 0.25f,0.25f,1.3f)};
         setPosition(position);
         setPosition(position);
         animationController=new AnimationController(modelInstance);

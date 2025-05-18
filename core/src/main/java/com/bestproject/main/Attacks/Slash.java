@@ -34,7 +34,7 @@ public class Slash extends Attack{
         lengh=2f;
         hitboxes=new ATKHITBOX[]{new ATKHITBOX(position.x, position.z, position.y, 1f,0.2f,0.3f,1f,new float[]{10,10,10},false)};
         StaticQuickMAth.normalizeSpeed(sincos);
-        hitboxes[0].rotate(Math.toDegrees(Math.atan2(flingdir[0],flingdir[2])));
+        hitboxes[0].rotate((float)Math.toDegrees(Math.atan2(flingdir[0],flingdir[2])));
         StaticBuffer.effectBuffer.addeffect(new FireEffect(lengh,this.position,1,40));
     }
     @Override

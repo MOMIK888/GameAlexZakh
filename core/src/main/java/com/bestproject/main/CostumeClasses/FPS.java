@@ -22,6 +22,7 @@ public class FPS extends TextRenderer{
     @Override
     public void render(SpriteBatch batch) {
         super.render(batch);
+
         setText(String.valueOf(Gdx.graphics.getFramesPerSecond()));
     }
 }

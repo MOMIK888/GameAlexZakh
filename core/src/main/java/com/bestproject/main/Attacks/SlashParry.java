@@ -22,7 +22,7 @@ public class SlashParry extends Attack{
         lengh=2f;
         hitboxes=new ParryHitbox[]{new ParryHitbox(position.x, position.z, position.y, 1f,0.2f,0.3f,1f,new float[]{20,20,20},false)};
         StaticQuickMAth.normalizeSpeed(sincos);
-        hitboxes[0].rotate(Math.toDegrees(Math.atan2(flingdir[0],flingdir[2])));
+        hitboxes[0].rotate((float)Math.toDegrees(Math.atan2(flingdir[0],flingdir[2])));
     }
     @Override
     public void setPosition(Vector3 position){

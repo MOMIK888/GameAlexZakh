@@ -2,6 +2,9 @@ package com.bestproject.main;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.bestproject.main.Game.GameCore;
+
+import java.awt.Point;
 
 public class CameraRotation {
     int current_pointer=-1;
@@ -10,6 +13,7 @@ public class CameraRotation {
     private float SCHEIGHT, SCWIDTH;
     private float rotationSpeed = 360f;
     private float sensitivity=1f;
+    private float touchLen=0;
     public CameraRotation(){
         SCHEIGHT=Gdx.graphics.getHeight();
         SCWIDTH=Gdx.graphics.getWidth();
@@ -23,12 +27,19 @@ public class CameraRotation {
     public void startTouch(int touchx, int touchy){
         touchStart.set(touchx, touchy);
         touchEnd.set(touchx, touchy);
+        touchLen=0;
     }
     public void drag(int screenX, int screenY){
         touchEnd.set(screenX, screenY);
     }
+    public void update(){
+        touchLen+= GameCore.deltatime;
+    }
     public void up(){
         current_pointer=-1;
+        if(touchLen<0.05f){
+            GameCore.lastclick.set(touchEnd.x,touchEnd.y);
+        }
     }
     public float[] getVectors(){
         float deltaX = touchEnd.x - touchStart.x;

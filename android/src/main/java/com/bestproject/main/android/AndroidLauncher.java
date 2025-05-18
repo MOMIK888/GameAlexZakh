@@ -7,6 +7,9 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.bestproject.main.Game.DatabaseInterface;
 import com.bestproject.main.Main;
 import com.bestproject.main.MainGame;
+import com.bestproject.main.android.Databases.MapInfo;
+import com.bestproject.main.android.Databases.PlayerInfo;
+import com.bestproject.main.android.Databases.QuestDatabase;
 
 /** Launches the Android application. */
 public class AndroidLauncher extends AndroidApplication {
@@ -15,6 +18,6 @@ public class AndroidLauncher extends AndroidApplication {
         super.onCreate(savedInstanceState);
         AndroidApplicationConfiguration configuration = new AndroidApplicationConfiguration();
         configuration.useImmersiveMode = true;
-        initialize(new MainGame(null), configuration);
+        initialize(new MainGame(new DatabaseInterface[]{new MapInfo(this.getApplicationContext()),new QuestDatabase(this.getApplicationContext()),new PlayerInfo(this.getApplicationContext() )}), configuration);
     }
 }

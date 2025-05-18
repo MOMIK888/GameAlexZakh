@@ -64,6 +64,7 @@ public class FirstLoadingScreen extends LoadingScreen implements Screen {
             drawLoading();
         }
         if(isLoaded){
+            shapeRenderer.setAutoShapeType(true);
             shapeRenderer.begin();
             shapeRenderer.setAutoShapeType(true);
             if(cdAnim>=0.5f){
@@ -90,10 +91,12 @@ public class FirstLoadingScreen extends LoadingScreen implements Screen {
         }
         shapeRenderer.setAutoShapeType(true);
         shapeRenderer.begin();
+        shapeRenderer.setAutoShapeType(true);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(secondcolor);
+        shapeRenderer.setAutoShapeType(true);
         shapeRenderer.rect(StaticBuffer.screenWidth/2-w/2,200*StaticBuffer.getScaleY(),w,h);
         shapeRenderer.setColor(color);
         if(assets!=null && assets.length>0) {
@@ -113,6 +116,12 @@ public class FirstLoadingScreen extends LoadingScreen implements Screen {
         }
         batch.end();
 
+
+    }
+
+    @Override
+    public void recompile(String[] assets, AssetManager assetManager, String[][] materials) {
+        super.recompile(assets, assetManager, materials);
 
     }
 

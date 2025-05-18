@@ -3,9 +3,12 @@ package com.bestproject.main.Moveset;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
+import com.bestproject.main.CharacterUtils.CharacterWidget;
 import com.bestproject.main.CharacterUtils.FontConfig;
 import com.bestproject.main.CostumeClasses.ImageButton;
 import com.bestproject.main.Game.GameCore;
@@ -19,9 +22,11 @@ import java.util.ArrayList;
 public class Moveset implements Disposable {
     protected int charinfo=0;
     protected Model characterModel;
+    protected ModelInstance modelInstance;
     protected ArrayList<ImageButton> buttons; //disposed
     protected ArrayList<Integer> simoltanious_buttons;
     protected ArrayList<Model> attacks;
+    AnimationController[] controllers;
     protected float[] charge=new float[]{0,0};
     protected float stamina;
     protected String MovesetName="moveset";
@@ -36,6 +41,7 @@ public class Moveset implements Disposable {
     protected int[][] Bitmap_button_coordinates;
     public float cd=0;
     protected Vector3 lock_omn_coordinates=new Vector3();
+    protected CharacterWidget characterWidget;
     public float damageMultiplier=0f;
     boolean isPunch=false;
     boolean lastManstanding=false;
@@ -46,6 +52,8 @@ public class Moveset implements Disposable {
         buttons=new ArrayList<>();
         simoltanious_buttons=new ArrayList<>();
         attacks=new ArrayList<>();
+        controllers=new AnimationController[3];
+        characterWidget=new CharacterWidget(null);
     }
     public void DrawMovesetWidget(ShapeRenderer shapeRenderer){
 
@@ -214,6 +222,12 @@ public class Moveset implements Disposable {
                 player.gravity_multip=1f;
             }
         }
+    }
+    public ModelInstance getModelInstance(){
+        return modelInstance;
+    }
+    public CharacterWidget getCharacterWidget(){
+        return characterWidget;
     }
 
 }

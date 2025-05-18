@@ -5,54 +5,59 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.bestproject.main.Attacks.Blast;
-import com.bestproject.main.Attacks.Flintlock;
-import com.bestproject.main.Attacks.coinFling;
 import com.bestproject.main.CharacterUtils.Elytra;
+import com.bestproject.main.CharacterUtils.RocketLauncher;
+import com.bestproject.main.CharacterUtils.Slingshot;
 import com.bestproject.main.CostumeClasses.ImageButton;
-import com.bestproject.main.Effects.SnapFlash;
 import com.bestproject.main.Game.GameCore;
 import com.bestproject.main.Game.GameEngine;
 import com.bestproject.main.MovingObjects.Player;
 import com.bestproject.main.StaticBuffer;
 import com.bestproject.main.StaticQuickMAth;
+import com.bestproject.main.Weapons.Rocket;
 
 public class PizzaGuy  extends Moveset{
     Color[] colors; //undisposable
-    coinFling coin=null; //disposed
     public boolean jump=false;
     public boolean dash;
     public boolean isUlting=false;
-    Flintlock flintlock;
-    Model FlintclockModel;
+    public boolean flying=false;
+    public boolean isOnground=false;
+    public boolean airclick=false;
     Texture[] Image_variations;
     Elytra elytra;
+    Slingshot slingshot;
+    RocketLauncher rocketLauncher;
 
     public PizzaGuy(){
         super();
         charinfo=1;
+        rocketLauncher=new RocketLauncher();
         colors=new Color[]{new Color(Color.rgba8888(0.4f, 0.2f, 0.6f,0.6f)),new Color(Color.rgba8888(0f, 0.8f, 1f,0.6f))};
         buttons.add(new ImageButton("Images/ButtonIcons/swap.png",1725,75,175,175));
         buttons.add(new ImageButton("Images/ButtonIcons/swap.png",1900,175,225,225));
         buttons.add(new ImageButton("Images/ButtonIcons/ult1.png",1600,50,120,120));
         buttons.add(new ImageButton("Images/ButtonIcons/dash.png",2150,280,170,170));
         buttons.add(new ImageButton("Images/ButtonIcons/dash.png",2150,100,100,100));
-        StaticBuffer.assetManager.load("Models/Attacks/blast.g3dj",Model.class);
-        StaticBuffer.assetManager.load("Models/Char2/girl.g3dj", Model.class);
-        StaticBuffer.assetManager.load("Models/Minor_models/flintlock.g3dj", Model.class);
-        StaticBuffer.assetManager.finishLoading();
-        FlintclockModel=StaticBuffer.assetManager.get("Models/Minor_models/flintlock.g3dj", Model.class);
-        flintlock=new Flintlock(FlintclockModel,new Vector3());
-        characterModel=StaticBuffer.assetManager.get("Models/Char2/girl.g3dj", Model.class);
-        attacks.add(StaticBuffer.assetManager.get("Models/Attacks/blast.g3dj", Model.class));
+        StaticBuffer.constantAssets.load("Models/Attacks/blast.g3dj",Model.class);
+        StaticBuffer.constantAssets.load("Models/Char4/PizzaGuy.g3dj", Model.class);
+        StaticBuffer.constantAssets.load("Models/Minor_models/flintlock.g3dj", Model.class);
+        StaticBuffer.constantAssets.finishLoading();
+        characterModel=StaticBuffer.constantAssets.get("Models/Char4/PizzaGuy.g3dj", Model.class);
+        attacks=null;
         hp=100f;
         elytra=new Elytra();
+        slingshot=new Slingshot();
         maxHp=100f;
         stamina=100;
+        modelInstance=new ModelInstance(characterModel);
+        modelInstance.transform.rotate(0f,1f,0f,90);
+        modelInstance.transform.scale(0.08f,0.08f,0.08f);
+        controllers=new AnimationController[]{new AnimationController(modelInstance),new AnimationController(modelInstance),new AnimationController(modelInstance)};
         Image_variations=new Texture[]{new Texture("Images/ButtonIcons/coinToss.png"), new Texture("Images/ButtonIcons/flintlock.png") };
 
     }
@@ -60,19 +65,16 @@ public class PizzaGuy  extends Moveset{
     @Override
     public void dispose() {
         super.dispose();
-        coin.dispose();
-        FlintclockModel.dispose();
-        flintlock.dispose();
+        if(Image_variations!=null) {
+            for (int i = 0; i < Image_variations.length; i++) {
+                Image_variations[i].dispose();
+            }
+        }
     }
 
     @Override
     public void update() {
         super.update();
-        if(coin!=null){
-            if(coin.expire()){
-                coin=null;
-            }
-        }
         ability_cooldown=ability_cooldown-(StaticQuickMAth.move(GameEngine.getGameCore().deltatime));
         charge[0]+=(StaticQuickMAth.move(GameEngine.getGameCore().deltatime)*80);
         cd-=StaticQuickMAth.move(GameEngine.getGameCore().deltatime);
@@ -86,12 +88,26 @@ public class PizzaGuy  extends Moveset{
                 goThrouh();
             }
         }
+        if(buttons.get(1).getPointer()!=-1){
+            simoltanious_buttons.add(1);
+            isPunch=true;
+        }
         if(current_state==5){
-            jump=buttons.get(4).getPointer()!=-1;
-            if(!jump){
-                current_state=0;
+            if(!airclick) {
+                jump = buttons.get(4).getPointer() != -1;
+                if (!jump) {
+                    current_state = 0;
+                } else {
+                    current_state = 5;
+                }
             } else{
-                current_state=5;
+                flying = buttons.get(4).getPointer() != -1;
+                if (!flying) {
+                    current_state = 0;
+                    airclick=false;
+                } else {
+                    current_state = 5;
+                }
             }
         }
         if(current_state==4){
@@ -107,10 +123,6 @@ public class PizzaGuy  extends Moveset{
     public void draw(SpriteBatch spriteBatch){
         for(int i=0; i<buttons.size(); i++){
             buttons.get(i).draw(spriteBatch, 0.6f);
-        }
-        if(isUlting) {
-            StaticBuffer.fonts[0].getData().setScale(1f);
-            StaticBuffer.fonts[0].draw(spriteBatch, String.valueOf(flintlock.getChance()), buttons.get(2).getCenterX(), buttons.get(2).getCenterY());
         }
     }
 
@@ -136,6 +148,7 @@ public class PizzaGuy  extends Moveset{
                 return true;
             };
         }
+
         return false;
     }
 
@@ -147,13 +160,8 @@ public class PizzaGuy  extends Moveset{
                     simoltanious_buttons.add(act);
                     cd=0.18f;
                     ability_cooldown=0.1f;
-                    GameEngine.getGameCore().getMap().addStatic(new SnapFlash(StaticBuffer.getPlayerCooordinates(),0.2f));
-                    StaticQuickMAth.setTimeFlow(0.5f,0.2f);
+                    //Ракета
                     current_state=2;
-                    if(coin!=null){
-                        coin.pluslengh(0.25f);
-                        cd=0.13f;
-                    }
                 }
             } else if (act == 2) {
                 if(charge[1]>99) {
@@ -168,13 +176,21 @@ public class PizzaGuy  extends Moveset{
             } else if(act==1){
                 simoltanious_buttons.add(1);
                 isPunch=true;
-                cd=0.25f;
+                cd=0.1f;
+
                 current_state=1;
             } else if (act == 3) {
                 current_state=4;
             } else if(act==4){
                 current_state=5;
-                jump=true;
+                if(isOnground) {
+                    jump = true;
+                    airclick=false;
+                } else {
+                    flying=true;
+                    airclick=true;
+                    controllers[0].setAnimation("metarig.002|fly",-1);
+                }
 
             }
         }
@@ -193,45 +209,47 @@ public class PizzaGuy  extends Moveset{
             player.lastdir=player.lastdir.set(player.movement.x,0,player.movement.z);
             if (current_state != 0 && StaticBuffer.ui.getState() == 0) {
                 player.current_state = 0;
-                player.animationController.setAnimation("metarig|walk", -1);
+                controllers[0].setAnimation("metarig.002|walk", -1);
+                controllers[1].setAnimation("metarig.002|WalkArms",-1);
             }
-            player.modelInstance.transform.rotate(0, 1, 0, angle - player.lastangle);
+            modelInstance.transform.rotate(0, 1, 0, angle - player.lastangle);
             player.lastangle = angle;
         }else if(StaticBuffer.ui.getState()==0){
             player.speed=1f;
             if(current_state!=1 ){
                 player.current_state=1;
-                player.animationController.setAnimation("metarig|idle",-1);
             }
         }
         if(StaticBuffer.ui.getState()==2){
             if(current_state!=2){
                 player.current_state=2;
-                player.animationController.setAnimation("metarig|arms aross", 1);
+                //ani,
             }
             multiplier=2f;
         }else if(StaticBuffer.ui.getState()==1){
             if(current_state!=3){
                 player.current_state=3;
-                player.animationController.setAnimation("metarig|Shoot",1);
+                //anim
             }
         }else if (StaticBuffer.ui.getState()==4) {
             player.speed=4f;
             player.hitboxes[0].setHeight(0.1f);
-            player.modelInstance.transform.rotate(0, 1, 0, angle - player.lastangle);
+            modelInstance.transform.rotate(0, 1, 0, angle - player.lastangle);
             player.lastangle = angle;
             player.current_state=4;
-            player.animationController.setAnimation("metarig|slide",1);
+            controllers[0].setAnimation("metarig|slide",1);
             StaticBuffer.dust.setPosition(new Vector3(StaticBuffer.getPlayerCooordinates()).add(new Vector3(0,0.3f,0)));
             StaticBuffer.dust.update(StaticQuickMAth.move(GameCore.deltatime));
             StaticBuffer.dust.render();
         }
         if(this.current_state==1){
-            if(!player.animationController.inAction){
+            if(!controllers[0].inAction){
                 this.current_state=0;
             }
         }
-        player.animationController.update(StaticQuickMAth.move(deltatime)*multiplier*player.speed);
+        controllers[0].update(StaticQuickMAth.move(deltatime)*multiplier);
+        controllers[1].update(StaticQuickMAth.move(deltatime)*multiplier);
+        controllers[2].update(StaticQuickMAth.move(deltatime)*multiplier);
         player.fractureMovement(player.movement);
         player.movement.set(0,0,0);
         player.movement.add(player.unnormalizedMovement);
@@ -239,20 +257,6 @@ public class PizzaGuy  extends Moveset{
             player.speed-=StaticQuickMAth.move(deltatime/2);
         } else{
             player.speed+=StaticQuickMAth.move(deltatime);
-        }
-        if (simoltanious_buttons.contains(0)) {
-            if (coin != null && !coin.expire()) {
-                Vector3 coin_position = new Vector3(coin.getPosition());
-                GameEngine.getGameCore().getMap().setPlayerImactFrame(0.08f);
-                player.setPosition(coin_position);
-                player.gravity_multip=0.1f;
-                player.setForce(coin.getAcceleration());
-                coin.setCostume(true);
-                charge[0] = 0;
-                current_state = 0;
-                simoltanious_buttons.clear();
-                return;
-            }
         }
     }
 
@@ -269,57 +273,28 @@ public class PizzaGuy  extends Moveset{
 
     @Override
     public void goThrouh(){
-        if (simoltanious_buttons.contains(0) && isPunch && !isUlting) {
-            float[] sin_cos;
-            if(StaticBuffer.ui.getIsLocked()) {
-                lock_omn_coordinates=GameEngine.getGameCore().getMap().tie_coordinates(lock_omn_coordinates,GameEngine.getGameCore().getMap().calculate_radius(2,new int[]{StaticBuffer.getPlayer_coordinates()[1],StaticBuffer.getPlayer_coordinates()[0]}));
-                sin_cos=StaticBuffer.getSin_Cos(StaticBuffer.getPlayerCooordinates(),lock_omn_coordinates);
-            } else{
-                sin_cos=new float[]{-MathUtils.cosDeg(GameCore.cameraRoationm),-MathUtils.sinDeg(GameCore.cameraRoationm)};
-            }
-            coin=new coinFling(new Vector3(StaticBuffer.getPlayerCooordinates()),new Vector3(sin_cos[1],-MathUtils.sinDeg(GameCore.cameraRoationX),sin_cos[0]));
-            GameEngine.getGameCore().getMap().addMoving(coin);
-            StaticQuickMAth.setTimeFlow(0.5f,0.2f);
-            isPunch=false;
-            simoltanious_buttons.clear();
-
-        } else if (simoltanious_buttons.contains(2)) {
+        if (simoltanious_buttons.contains(2)) {
             charge[1]=0;
             simoltanious_buttons.clear();
+            //Ульта
 
         } else if (isPunch && cooldowns[0]<=0){
             if(!isUlting) {
-                if (!StaticBuffer.ui.getIsLocked()) {
-                    lock_omn_coordinates = GameEngine.getGameCore().getMap().tie_coordinates(lock_omn_coordinates, GameEngine.getGameCore().getMap().calculate_radius(2, new int[]{StaticBuffer.getPlayer_coordinates()[1], StaticBuffer.getPlayer_coordinates()[0]}));
-                }
-                float[] sin_cos = new float[]{-MathUtils.cosDeg(GameCore.cameraRoationm),-MathUtils.sinDeg(GameCore.cameraRoationm)};
-                GameEngine.getGameCore().getMap().addMoving(new Blast(new ModelInstance(attacks.get(0)), StaticBuffer.getPlayerCooordinates(), new float[]{sin_cos[1],-MathUtils.sinDeg(GameCore.cameraRoationX),sin_cos[0]}));
-                isPunch = false;
-                cooldowns[0] = 0.3f;
-                if (!StaticBuffer.ui.getIsLocked()) {
-                    lock_omn_coordinates = new Vector3();
-                }
+                slingshot.Shoot(GameCore.camera.direction,StaticBuffer.getPlayerCooordinates()); //Заменить на координаты рогатки
+                cooldowns[0] = 0.1f;
+                cd=0.11f;
+                isPunch=false;
                 simoltanious_buttons.clear();
             } else{
                 isUlting=false;
-                flintlock.setExplosion(true);
-                flintlock.setPosition(StaticBuffer.getPlayerCooordinates());
-                GameEngine.getGameCore().getMap().addMoving(flintlock);
             }
         }else if (simoltanious_buttons.contains(0)) {
             if(isUlting){
-                flintlock.rollCoin();
                 simoltanious_buttons.clear();
                 return;
             }
-            if(coin!=null){
-                return;
-            }
-            int[] index=GameEngine.getGameCore().getMap().getNearestObject(StaticBuffer.getPlayerCooordinates(),GameEngine.getGameCore().getMap().calculate_radius(2,new int[]{StaticBuffer.getPlayer_coordinates()[1],StaticBuffer.getPlayer_coordinates()[0]}));
-            if(index[0]!=-1){
-                GameEngine.getGameCore().getMap().swap(new int[]{StaticBuffer.getPlayer_coordinates()[1],StaticBuffer.getPlayer_coordinates()[0]},index);
-                charge[0]=0;
-            }
+            rocketLauncher.Shoot(StaticBuffer.getPlayerCooordinates(),GameCore.camera.direction);
+            charge[0]=0;
             simoltanious_buttons.clear();
         } else if(simoltanious_buttons.contains(3) && cooldowns[1]<=0){
             cooldowns[1]=1.4f;
@@ -336,10 +311,10 @@ public class PizzaGuy  extends Moveset{
     }
     @Override
     public void forceNullification(Player player){
-        if(!jump) {
+        if(!flying) {
             float glvevel = GameEngine.getGameCore().getMap().GetGroundLevel(new Vector3((float) player.hitboxes[0].x, (float) player.hitboxes[0].z, (float) player.hitboxes[0].y));
             player.movement.add(StaticQuickMAth.getMultipVec(player.force,StaticQuickMAth.move(GameCore.deltatime)));
-            if (player.hitboxes[0].getBottom() >= glvevel) {
+            if (player.hitboxes[0].getBottom()>glvevel+0.03f) {
                 if (player.force.x > 0) {
                     player.force.x -= StaticQuickMAth.move(3f) * GameCore.deltatime;
                     if (player.force.x < 0) {
@@ -363,16 +338,16 @@ public class PizzaGuy  extends Moveset{
                     }
                 }
                 if (player.isGravityAffected) {
-                    player.force.y -= StaticQuickMAth.getGravityAcceleration() * player.gravity_multip / 2f / (Math.max(1, (Math.abs(player.movement.x) + Math.abs(player.movement.z)) * 50));
+                    player.force.y -= StaticQuickMAth.getGravityAcceleration() * player.gravity_multip*8;
+                    isOnground=false;
                 } else if (player.force.y < 0) {
                     player.force.y = 0;
-                }
-                if (player.force.y < -0.5f) {
-                    player.force.y = -0.5f;
+                    isOnground=true;
                 }
                 if (player.hitboxes[0].getBottom() < glvevel) {
                     player.position.set(new Vector3(player.position.x, (float) (glvevel + (player.hitboxes[0].height / 2.01f)), player.position.z));
                     player.gravity_multip = 1f;
+                    player.isGravityAffected=false;
                 }
             } else {
                 if (player.force.x > 0) {
@@ -399,16 +374,47 @@ public class PizzaGuy  extends Moveset{
                 }
                 if (player.force.y < 0) {
                     player.force.y = 0;
+                    isOnground=true;
+
                 }
-                if (player.hitboxes[0].getBottom() < glvevel) {
-                    player.position.set(new Vector3(player.position.x, (float) (glvevel + (player.hitboxes[0].height / 2.01f)), player.position.z));
+                if (player.hitboxes[0].getBottom() < glvevel+0.05) {
+                    if(player.force.y<0.1) {
+                        player.position.set(new Vector3(player.position.x, (float) (glvevel + (player.hitboxes[0].height / 2.01f)), player.position.z));
+                    }
                     player.gravity_multip = 1f;
+                    isOnground=true;
+                    player.isGravityAffected=false;
                 }
             }
+            if(!player.isGravityAffected) {
+                if (jump) {
+                    System.out.println("Cvdv");
+                    buttons.get(4).release();
+                    current_state = 0;
+                    jump = false;
+                    player.force.y += 3f;
+                    player.isGravityAffected=true;
+                    isOnground=false;
+                }
+            }
+            controllers[2].setAnimation("metarig.002|wingsFold");
         } else{
+
             elytra.update(player.force,-GameCore.cameraRoationm-90,GameCore.cameraRoationX,StaticQuickMAth.move(GameCore.deltatime));
             player.force=elytra.getVelocity();
             player.movement.add(StaticQuickMAth.getMultipVec(player.force,StaticQuickMAth.move(GameCore.deltatime)));
+            isOnground=!player.isGravityAffected;
+            if(isOnground){
+                flying=false;
+                buttons.get(4).release();
+            }
+            float glvevel = GameEngine.getGameCore().getMap().GetGroundLevel(new Vector3((float) player.hitboxes[0].x, (float) player.hitboxes[0].z, (float) player.hitboxes[0].y));
+            if(player.hitboxes[0].getBottom()<glvevel+0.03){
+                flying=false;
+                isOnground=true;
+                buttons.get(4).release();
+            }
+
         }
     }
 }

@@ -44,7 +44,7 @@ public class Blue_Slime extends Enemy {
     public Blue_Slime(Vector3 position) {
         super(new ModelInstance(StaticBuffer.current_enemies.get(0)), position);
         setPosition(position);
-        hitboxes=new HITBOX[]{new HITBOX(position.x, position.z, position.y, 0.25,0.25,1)};
+        hitboxes=new HITBOX[]{new HITBOX(position.x, position.z, position.y, 0.25f,0.25f,1)};
         animationController=new AnimationController(modelInstance);
         animationController.setAnimation("Armature|ArmatureAction",-1);
         modelInstance.transform.scale(0.3f,0.3f,0.3f);

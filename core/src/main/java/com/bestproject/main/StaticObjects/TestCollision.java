@@ -18,42 +18,5 @@ import com.bestproject.main.ObjectFragment.HITBOX;
 import com.bestproject.main.StaticBuffer;
 import com.bestproject.main.StaticQuickMAth;
 
-public class TestCollision extends StaticObject {
-    private static Model stoneModel;
-    private static AssetManager assetManager;
-    HITBOX[] hitboxes;
-
-    static {
-        assetManager = new AssetManager();
-        assetManager.load("Models/player.g3db", Model.class);
-        assetManager.finishLoading();
-        stoneModel = assetManager.get("Models/player.g3db", Model.class);
-    }
-    public TestCollision(Vector3 position) {
-        super(new ModelInstance(stoneModel), position);
-        modelInstance.transform.scale(0.3f,0.3f,0.3f);
-        hitboxes=new HITBOX[]{new HITBOX(position.x, position.z, position.y,0.25,0.25,0.25)};
-    }
-    @Override
-    public HITBOX[] gethbs() {
-        return hitboxes;
-    }
-
-    public static void disposeAll() {
-        if (stoneModel != null) {
-            stoneModel.dispose();
-        }
-        if (assetManager != null) {
-            assetManager.dispose();
-        }
-    }
-    @Override
-    public void update(){
-
-    }
-
-    @Override
-    public void dispose() {
-        disposeAll();
-    }
+public class TestCollision {
 }

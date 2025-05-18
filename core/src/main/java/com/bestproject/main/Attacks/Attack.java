@@ -7,7 +7,7 @@ import com.bestproject.main.MovingObjects.MovingObject;
 import com.bestproject.main.StaticQuickMAth;
 
 public class Attack extends MovingObject {
-    float lengh;
+    public float lengh;
 
     public Attack(ModelInstance model, Vector3 position) {
         super(model, position);

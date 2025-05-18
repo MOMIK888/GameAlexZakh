@@ -85,8 +85,8 @@ import com.badlogic.gdx.utils.Array;
 
 public class MainGame extends ApplicationAdapter{
    GameEngine gameEngine;
-   DatabaseInterface databaseInterface;
-   public MainGame(DatabaseInterface dbinterface){
+   public static DatabaseInterface[] databaseInterface;
+   public MainGame(DatabaseInterface[] dbinterface){
        databaseInterface=dbinterface;
    }
     @Override

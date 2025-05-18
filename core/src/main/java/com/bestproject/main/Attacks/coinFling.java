@@ -34,7 +34,6 @@ public class coinFling extends Attack{
         super(StaticBuffer.getEffectfromBuffer(1), position);
         sincos=new Vector3(flingdir);
         StaticQuickMAth.normalizeSpeed(sincos);
-        System.out.println(sincos.x+" "+sincos.y+" "+sincos.z);
         lengh=2f;
         hb=new HITBOX(position.x,position.z,position.y,0.1f,0.1f,0.1f);
         modelInstance.transform.scale(0.001f,0.001f,0.001f);

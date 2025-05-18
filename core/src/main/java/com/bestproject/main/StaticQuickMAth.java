@@ -130,6 +130,21 @@ public class StaticQuickMAth {
         }
         return minIndex;
     }
+    public static Vector3 calculateExplosionForce(Vector3 playerPos, Vector3 explosionPos, float force) {
+        float dx = playerPos.x - explosionPos.x;
+        float dy = playerPos.y - explosionPos.y;
+        float dz = playerPos.z - explosionPos.z;
+        float distance = (float)Math.sqrt(dx*dx + dy*dy + dz*dz);
+        if (distance > 0) {
+            dx /= distance;
+            dy /= distance;
+            dz /= distance;
+        }
+        float forceX = dx * force;
+        float forceY = dy * force;
+        float forceZ = dz * force;
+        return new Vector3(forceX, forceY, forceZ);
+    }
     public static Vector3 getMultipVec(Vector3 vector, float value){
         return new Vector3(vector.x*value,vector.y*value,vector.z*value);
     }

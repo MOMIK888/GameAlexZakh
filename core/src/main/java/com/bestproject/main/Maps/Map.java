@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.bestproject.main.MapUtils.HITBOXMAP;
 import com.bestproject.main.MovingObjects.MovingObject;
 import com.bestproject.main.MovingObjects.Player;
 import com.bestproject.main.ObjectItem;
@@ -40,6 +41,7 @@ public class Map implements Disposable {
     protected ModelBatch modelBatch;
     protected Environment environment;
     public boolean staticRender=true;
+    public int mapIndex=-1;
 
     public Map(){
         initialize();
@@ -53,6 +55,15 @@ public class Map implements Disposable {
 
     @Override
     public void dispose() {
+    }
+    public void initializeMapAttributes(int mapIndex){
+
+    }
+    public void AfterInit(){
+
+    }
+    public void LoadDependencies(){
+
     }
     public void RearrangeMoving(Array<MovingObject> source) {
         for (int m = source.size - 1; m >= 0; m--) {
@@ -308,6 +319,9 @@ public class Map implements Disposable {
             }
         }
     }
+    public int getUniqueIndex(){
+        return -1;
+    }
     public void setImactFrames(float counter){
         impactFrames=counter;
         isImpactFraming=true;
@@ -333,6 +347,9 @@ public class Map implements Disposable {
         }
         return result;
     }
+    protected void additionalRender(){
+
+    }
     public Vector3 tie_coordinates(Vector3 coords,int[][] calc){
         return new Vector3();
     }
@@ -355,6 +372,12 @@ public class Map implements Disposable {
             return Tiles.get(normalizedx).get(normalizedy).getGroundLevel();
         }
         return 0;
+    }
+    public HITBOXMAP getHitboxMap(){
+        return null;
+    }
+    public Texture getHeightMap(){
+        return null;
     }
 
 }

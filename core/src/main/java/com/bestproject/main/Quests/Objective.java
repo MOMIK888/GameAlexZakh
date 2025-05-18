@@ -1,28 +1,34 @@
 package com.bestproject.main.Quests;
 
+import com.badlogic.gdx.math.Vector3;
+
 public class Objective {
     int[] kill;
     int[] collect;
     int[][] tasks;
     boolean iscompleted=false;
-    float[] destination;
+    Vector3 destination;
     int takamount=3;
     float range;
     String task_name="";
 
-    public Objective(int[] kill, int[] collect, int[][] tasks, boolean iscompleted, float[] destination, float range) {
+    public Objective(int[] kill, int[] collect, int[][] tasks, boolean iscompleted, Vector3 destination, float range) {
         this.kill = kill;
         this.collect = collect;
         this.tasks = tasks;
         this.iscompleted = iscompleted;
         this.destination = destination;
         this.range = range;
-        if (this.kill[0] <= this.kill[1]) {
-            takamount -= 1;
+        if(kill!=null) {
+            if (this.kill[0] <= this.kill[1]) {
+                takamount -= 1;
 
+            }
         }
-        if(this.collect[0]<=this.collect[1]){
-            takamount-=1;
+        if(collect!=null) {
+            if (this.collect[0] <= this.collect[1]) {
+                takamount -= 1;
+            }
         }
         if(this.tasks!=null) {
             if(this.tasks[0][0] <= this.tasks[0][1]){
@@ -89,8 +95,8 @@ public class Objective {
     public boolean getIscompleted(){
         return iscompleted;
     }
-    public float[] getDestination(){
-        return  destination;
+    public Vector3 getDestination(){
+        return destination;
     }
     public int[] getKill(){
         return kill;

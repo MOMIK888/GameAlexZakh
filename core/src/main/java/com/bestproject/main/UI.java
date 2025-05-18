@@ -67,8 +67,10 @@ public class UI implements Disposable {
             StaticBuffer.setIsPaused(true);
             ans=true;
         } else{
-            ans=ans||movesets.get(current_moveset).OnTouch(touchx,touchy,pointer);
-            ans=ans||StaticBuffer.textRenderer.OnTouch(touchx,touchy);
+            if(!StaticBuffer.isCreative) {
+                ans = ans || movesets.get(current_moveset).OnTouch(touchx, touchy, pointer);
+                ans = ans || StaticBuffer.textRenderer.OnTouch(touchx, touchy);
+            }
         }
         return ans;
     }
@@ -84,6 +86,9 @@ public class UI implements Disposable {
         } else{
             StaticBuffer.textRenderer.render2(shapeRenderer);
             movesets.get(current_moveset).drawButtonPaddings(shapeRenderer);
+            for(int i=0; i<movesets.size();i++){
+                movesets.get(i).getCharacterWidget().draw(shapeRenderer,i,movesets.size());
+            }
         }
         shapeRenderer.end();
         spriteBatch.begin();

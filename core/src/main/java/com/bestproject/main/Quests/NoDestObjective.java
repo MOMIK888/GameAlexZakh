@@ -1,7 +1,9 @@
 package com.bestproject.main.Quests;
 
+import com.badlogic.gdx.math.Vector3;
+
 public class NoDestObjective extends Objective{
-    public NoDestObjective(int[] kill, int[] collect, int[][] tasks, boolean iscompleted, float[] destination, int range) {
+    public NoDestObjective(int[] kill, int[] collect, int[][] tasks, boolean iscompleted, Vector3 destination, int range) {
         super(kill, collect, tasks, iscompleted, destination, range);
     }
 

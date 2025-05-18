@@ -1,33 +1,24 @@
 package com.bestproject.main.Moveset;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.bestproject.main.Attacks.Attack;
 import com.bestproject.main.Attacks.Blast;
 import com.bestproject.main.Attacks.Flintlock;
 import com.bestproject.main.Attacks.coinFling;
 import com.bestproject.main.CostumeClasses.ImageButton;
-import com.bestproject.main.Effects.Effect;
 import com.bestproject.main.Effects.SnapFlash;
 import com.bestproject.main.Game.GameCore;
 import com.bestproject.main.Game.GameEngine;
-import com.bestproject.main.MovingObjects.MovingObject;
 import com.bestproject.main.MovingObjects.Player;
 import com.bestproject.main.StaticBuffer;
 import com.bestproject.main.StaticQuickMAth;
-import com.sun.org.apache.xpath.internal.operations.Mod;
-
-import java.util.ArrayList;
 
 public class Tp_quickMoveset extends Moveset{
     Color[] colors; //undisposable
@@ -57,6 +48,9 @@ public class Tp_quickMoveset extends Moveset{
         characterModel=StaticBuffer.assetManager.get("Models/Char2/girl.g3dj", Model.class);
         attacks.add(StaticBuffer.assetManager.get("Models/Attacks/blast.g3dj", Model.class));
         hp=100f;
+        modelInstance=new ModelInstance(characterModel);
+        modelInstance.transform.setToRotation(0,1,0,90);
+        modelInstance.transform.scale(0.3f,0.3f,0.3f);
         maxHp=100f;
         stamina=100;
         Image_variations=new Texture[]{new Texture("Images/ButtonIcons/coinToss.png"), new Texture("Images/ButtonIcons/flintlock.png") };
@@ -198,7 +192,7 @@ public class Tp_quickMoveset extends Moveset{
             player.lastdir=player.lastdir.set(player.movement.x,0,player.movement.z);
                 if (current_state != 0 && StaticBuffer.ui.getState() == 0) {
                     player.current_state = 0;
-                    player.animationController.setAnimation("metarig|walk", -1);
+                    controllers[0].setAnimation("metarig|walk", -1);
             }
             player.modelInstance.transform.rotate(0, 1, 0, angle - player.lastangle);
             player.lastangle = angle;
@@ -206,19 +200,19 @@ public class Tp_quickMoveset extends Moveset{
             player.speed=1f;
             if(current_state!=1 ){
                 player.current_state=1;
-                player.animationController.setAnimation("metarig|idle",-1);
+                controllers[0].setAnimation("metarig|idle",-1);
             }
         }
         if(StaticBuffer.ui.getState()==2){
             if(current_state!=2){
                 player.current_state=2;
-                player.animationController.setAnimation("metarig|arms aross", 1);
+                controllers[0].setAnimation("metarig|arms aross", 1);
             }
             multiplier=2f;
         }else if(StaticBuffer.ui.getState()==1){
             if(current_state!=3){
                 player.current_state=3;
-                player.animationController.setAnimation("metarig|Shoot",1);
+                controllers[0].setAnimation("metarig|Shoot",1);
             }
         }else if (StaticBuffer.ui.getState()==4) {
             player.speed=4f;
@@ -226,17 +220,17 @@ public class Tp_quickMoveset extends Moveset{
             player.modelInstance.transform.rotate(0, 1, 0, angle - player.lastangle);
             player.lastangle = angle;
             player.current_state=4;
-            player.animationController.setAnimation("metarig|slide",1);
+            controllers[0].setAnimation("metarig|slide",1);
             StaticBuffer.dust.setPosition(new Vector3(StaticBuffer.getPlayerCooordinates()).add(new Vector3(0,0.3f,0)));
             StaticBuffer.dust.update(StaticQuickMAth.move(GameCore.deltatime));
             StaticBuffer.dust.render();
         }
         if(this.current_state==1){
-            if(!player.animationController.inAction){
+            if(!controllers[0].inAction){
                 this.current_state=0;
             }
         }
-        player.animationController.update(StaticQuickMAth.move(deltatime)*multiplier*player.speed);
+        controllers[0].update(StaticQuickMAth.move(deltatime)*multiplier*player.speed);
         player.fractureMovement(player.movement);
         player.movement.set(0,0,0);
         player.movement.add(player.unnormalizedMovement);

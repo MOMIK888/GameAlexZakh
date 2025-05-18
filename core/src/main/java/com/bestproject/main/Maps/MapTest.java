@@ -41,7 +41,6 @@ public class MapTest extends Map implements Disposable {
         initialize();
         movingObjects.get(0).get(0).add(new Player(new Vector3(0f,0.30f,0f)));
         movingObjects.get(1).get(1).add(new Blue_Slime(new Vector3(1f,0f,1f)));
-        staticObjects.get(0).get(0).add(new TestCollision(new Vector3(0f,0f,0f)));
         staticObjects.get(2).get(0).add(new Barrel(new Vector3(4f,0.5f,0f)));
         SnapWallToGrid(new StoneWall(new Vector3(2f,0f,2f),270),270,1,1);
     }

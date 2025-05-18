@@ -1,5 +1,8 @@
 package com.bestproject.main.Game;
 
+import static com.bestproject.main.StaticBuffer.screenHeight;
+import static com.bestproject.main.StaticBuffer.screenWidth;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ai.utils.Collision;
@@ -16,6 +19,7 @@ import com.badlogic.gdx.graphics.g3d.RenderableProvider;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
+import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
@@ -26,6 +30,7 @@ import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.bestproject.main.CameraRotation;
+import com.bestproject.main.CostumeClasses.Click;
 import com.bestproject.main.CostumeClasses.CostumeShader;
 import com.bestproject.main.CostumeClasses.CostumeShaderProvider;
 import com.bestproject.main.CostumeClasses.FPS;
@@ -35,6 +40,8 @@ import com.bestproject.main.LoadScreen.LoadingScreen;
 import com.bestproject.main.Maps.Dungeon;
 import com.bestproject.main.Maps.Map;
 import com.bestproject.main.Maps.MapTest;
+import com.bestproject.main.Maps.Tavern;
+import com.bestproject.main.Maps.Village;
 import com.bestproject.main.MovingObjects.Player;
 import com.bestproject.main.Skyboxes.Skybox;
 import com.bestproject.main.StaticBuffer;
@@ -42,18 +49,23 @@ import com.bestproject.main.StaticQuickMAth;
 import com.bestproject.main.StaticShaders;
 import com.bestproject.main.Tiles.StoneTile;
 
+import java.awt.Point;
+
 public class GameCore implements Disposable, InputProcessor {
     public static PerspectiveCamera camera=new PerspectiveCamera(60, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());;
     public static float cameraRoationm=90;
     public static float cameraRoationX=0;
+    public static Click lastclick=new Click();
     private ShapeRenderer shapeRenderer;
     static Vector3 additionalCooordinates=new Vector3();
     Joystick joystick;
     public static float deltatime=0;
     static CameraRotation cameraRotation=new CameraRotation();
     static CameraController cameraController=new CameraController();
+    public FirstPersonCameraController fps;
+    public static int TemporaryMapBuffer=-1;
     int Screenheight=Gdx.graphics.getHeight();
-    LoadingScreen loadingScreen;
+    public LoadingScreen loadingScreen;
     Map map;
     public GameCore() {
         StaticShaders.init();
@@ -98,9 +110,10 @@ public class GameCore implements Disposable, InputProcessor {
             Vector3 newpos=new Vector3(camera.position);
             Vector3 pickRay=camera.getPickRay(StaticBuffer.screenWidth/2f,StaticBuffer.screenHeight/2).direction;
             Vector2 jval=joystick.getDIrectionCreative();
-            newpos=newpos.add(pickRay.x*jval.y*deltatime*3,pickRay.y*jval.y*deltatime*3,pickRay.z*jval.y*deltatime*3);
-            newpos=newpos.add(pickRay.z*jval.x*deltatime*3,0,pickRay.x*jval.x*deltatime*3);
+            float speed=4f;
+            newpos=newpos.add(pickRay.x*jval.y*deltatime*3*speed,pickRay.y*jval.y*deltatime*3*speed,pickRay.z*jval.y*deltatime*3*speed);
             StaticBuffer.creativeMode.draw();
+            fps.update(0.01f);
             camera.position.set(newpos);
         } else{
             map.render(camera);
@@ -111,11 +124,20 @@ public class GameCore implements Disposable, InputProcessor {
         shapeRenderer.end();
         StaticBuffer.ui.draw(StaticBuffer.spriteBatch, StaticBuffer.TestShapeRenderer);
         StaticBuffer.effectBuffer.render(StaticBuffer.decalBatch);
+        if(TemporaryMapBuffer!=-1){
+            if(TemporaryMapBuffer==0){
+                map=new Tavern();
+            } else if(TemporaryMapBuffer==1){
+                map=new Village();
+            }
+            TemporaryMapBuffer=-1;
+        }
         return true;
     }
     public void update(){
         camera.update();
         StaticBuffer.ui.update();
+        cameraRotation.update();
     }
 
     @Override
@@ -146,6 +168,7 @@ public class GameCore implements Disposable, InputProcessor {
         camera.position.set(additionalCooordinates);
         camera.lookAt(StaticBuffer.getPlayerCooordinates());
         camera.up.set(Vector3.Y);
+        lastclick.update();
 
 
     }
@@ -187,8 +210,12 @@ public class GameCore implements Disposable, InputProcessor {
         } else if(StaticBuffer.ui.onTouch(screenX,Gdx.graphics.getHeight()-screenY,pointer)){
             return true;
         } else{
-            cameraRotation.startTouch(screenX,Screenheight-screenY);
-            cameraRotation.setCurrent_pointer(pointer);
+            if(!StaticBuffer.isCreative) {
+                cameraRotation.startTouch(screenX, Screenheight - screenY);
+                cameraRotation.setCurrent_pointer(pointer);
+            } else{
+                fps.touchDown(screenX,screenY,pointer,button);
+            }
         }
         return false;
     }
@@ -199,7 +226,7 @@ public class GameCore implements Disposable, InputProcessor {
             joystick.resetIndex();
             joystick.setTouched(false);
         } if(cameraRotation.getCurrent_pointer()==pointer){
-            cameraRotation.setCurrent_pointer(-1);
+            cameraRotation.up();
         }
         StaticBuffer.ui.onUp(screenX,Gdx.graphics.getHeight()-screenY,pointer);
         return false;
@@ -216,6 +243,9 @@ public class GameCore implements Disposable, InputProcessor {
             joystick.update(screenX,Gdx.graphics.getHeight()-screenY);
         } else if(cameraRotation.getCurrent_pointer()==pointer){
             cameraRotation.drag(screenX,Screenheight-screenY);
+        }
+        if(StaticBuffer.isCreative){
+            fps.touchDragged(screenX,screenY,pointer);
         }
         return false;
     }
@@ -235,6 +265,9 @@ public class GameCore implements Disposable, InputProcessor {
     public void setMap(Map map){
         this.map=map;
     }
+    public void setTemporaryMapBuffer(int mapIndex){
+        TemporaryMapBuffer=mapIndex;
+    }
 }
 class CameraController {
     private float currentYRotation = 0;
@@ -252,8 +285,11 @@ class CameraController {
 
         return actualDeltaYRotation;
     }
+
     public float getCurrentYRotation() {
         return currentYRotation;
-}}
+    }
+
+}
 
 

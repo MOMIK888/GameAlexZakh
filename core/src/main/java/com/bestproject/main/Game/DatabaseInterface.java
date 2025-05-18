@@ -1,5 +1,6 @@
 package com.bestproject.main.Game;
 
 public interface DatabaseInterface {
-    void insertPlayer(String name, int score);
+    String getInfo(int index);
+    void setInfo(int index, String info);
 }

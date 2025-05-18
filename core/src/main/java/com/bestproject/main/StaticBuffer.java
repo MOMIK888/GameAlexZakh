@@ -17,10 +17,12 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.decals.GroupStrategy;
+import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -41,6 +43,7 @@ import com.bestproject.main.Game.GameCore;
 import com.bestproject.main.Game.GameEngine;
 import com.bestproject.main.LoadScreen.FirstLoadingScreen;
 import com.bestproject.main.LoadScreen.LoadingScreen;
+import com.bestproject.main.ObjectFragment.HITBOX;
 import com.bestproject.main.Quests.QuestManager;
 import com.bestproject.main.RenderOverride.RenderOverride;
 import com.bestproject.main.SoundManagement.CostumeSound;
@@ -49,6 +52,7 @@ import com.bestproject.main.SoundManagement.SoundManager;
 import java.util.ArrayList;
 
 public class StaticBuffer implements Disposable {
+    public static Model Testmodel=createSimpleCube();
     public static DatabaseController databaseController=new DatabaseController();
     public static CreativeMode creativeMode=new CreativeMode();
     public static QuestManager questManager=new QuestManager();
@@ -79,6 +83,7 @@ public class StaticBuffer implements Disposable {
     public static int unique_index=0;//disposed
     public static  SpriteBatch spriteBatch=new SpriteBatch(); //disposed
     public static AssetManager assetManager=new AssetManager(); //disposed
+    public static AssetManager constantAssets=new AssetManager();
     static public Color[] rarity_colors = new Color[]{new Color(Color.rgba8888(253/255f, 254/255f, 254/255f,1f)),
         new Color(Color.rgba8888(39/255f, 174/255f, 96/255f,1f)),
         new Color(Color.rgba8888(36/255f,113/255f,163/255f,1f)),
@@ -107,7 +112,7 @@ public class StaticBuffer implements Disposable {
     }
 
     public static void setPlayerCooordinates(Vector3 playerCooordinates) {
-        PlayerCooordinates = playerCooordinates;
+        PlayerCooordinates.set(playerCooordinates);
     }
     public static int getUnique_index(){
         unique_index+=1;
@@ -184,6 +189,7 @@ public class StaticBuffer implements Disposable {
 
     public static void EnableCREATIVE() {
         isCreative=true;
+        GameEngine.getGameCore().fps=new FirstPersonCameraController(GameCore.camera);
     }
 
 
@@ -216,16 +222,54 @@ public class StaticBuffer implements Disposable {
             current_enemies.add(assetManager.get(i));
         }
     }
+    public static void initialize_BigCity_models(){
+        current_enemies.clear();
+        soundManager.dispose();
+        currentModels.clear();
+        String[] assets=new String[]{"Models/Chunks/Chunk1/chunk1.g3dj"
+        };
+        String[][] manager_of_assets=new String[][]{{"Models/Chunks/Chunk1/chunk1.g3dj"},{}};
+        GameEngine.getGameCore().setLoadingScreen(new FirstLoadingScreen(assets,assetManager,manager_of_assets));
+
+    }
     public static void initialize_City_models(){
         current_enemies.clear();
         assetManager.load("Sounds/Music/song1.mp3", Music.class);
         assetManager.finishLoading();
+        soundManager.dispose();
         soundManager.addConstantSound("1x1x1x1x",new CostumeSound(assetManager.get("Sounds/Music/song1.mp3"), true, 20f));
         soundManager.playSoundConstant("1x1x1x1x");
         currentModels.clear();
         String[] assets=new String[]{"Models/Buildings/building.g3dj","Models/Buildings/concreteTile.g3dj","Models/Char3/character3.g3dj","Models/Buildings/bldg2.g3dj"
         };
         String[][] manager_of_assets=new String[][]{{"Models/Buildings/building.g3dj","Models/Buildings/concreteTile.g3dj","Models/Buildings/bldg2.g3dj"},{"Models/Char3/character3.g3dj"}};
+        GameEngine.getGameCore().setLoadingScreen(new FirstLoadingScreen(assets,assetManager,manager_of_assets));
+
+    }
+    public static void initialize_Village_models(){
+        current_enemies.clear();
+        assetManager.load("Sounds/Music/song2.mp3", Music.class);
+        assetManager.finishLoading();
+        soundManager.dispose();
+        soundManager.addConstantSound("theme",new CostumeSound(assetManager.get("Sounds/Music/song2.mp3"), false, 20f));
+        soundManager.playSoundConstant("theme");
+        currentModels.clear();
+        String[] assets=new String[]{"Models/SingleMeshMaps/village.g3dj"
+        };
+        String[][] manager_of_assets=new String[][]{{"Models/SingleMeshMaps/village.g3dj"},{}};
+        GameEngine.getGameCore().setLoadingScreen(new FirstLoadingScreen(assets,assetManager,manager_of_assets));
+    }
+    public static void initialize_Tavern_models(){
+        current_enemies.clear();
+        assetManager.load("Sounds/Music/song2.mp3", Music.class);
+        assetManager.finishLoading();
+        soundManager.dispose();
+        soundManager.addConstantSound("theme",new CostumeSound(assetManager.get("Sounds/Music/song2.mp3"), false, 20f));
+        soundManager.playSoundConstant("theme");
+        currentModels.clear();
+        String[] assets=new String[]{"Models/SingleMeshMaps/Tavern/tavern.g3dj"
+        };
+        String[][] manager_of_assets=new String[][]{{"Models/SingleMeshMaps/Tavern/tavern.g3dj"},{}};
         GameEngine.getGameCore().setLoadingScreen(new FirstLoadingScreen(assets,assetManager,manager_of_assets));
     }
     public static Rectangle loadTexture_plus_resize(float scale_on_x, float scale_on_y, boolean adaptx, int width, int height, int x, int y){
@@ -260,5 +304,37 @@ public class StaticBuffer implements Disposable {
     }
     public static Vector3 getPlayerCoordinates() {
         return player_coordinates;
+    }
+    public static Array<HITBOX> decipherHitboxInfo(String packedInfo) {
+        Array<HITBOX> hitboxArray = new Array<>();
+        if (packedInfo == null || packedInfo.isEmpty()) return hitboxArray;
+        String[] hitboxEntries = packedInfo.split("\\^");
+        for (String entry : hitboxEntries) {
+            if (entry.trim().isEmpty()) continue;
+            String[] parts = entry.split("&");
+            if (parts.length < 3) continue;
+            String[] pos = parts[0].split("\\$");
+            String[] size = parts[1].split("\\$");
+            String type = parts[2];
+            if (pos.length < 3 || size.length < 3) continue;
+            HITBOX hitbox = new HITBOX(0, 0, 0, 0, 0, 0);
+            hitbox.x = Float.parseFloat(pos[0]);
+            hitbox.y = Float.parseFloat(pos[1]);
+            hitbox.z = Float.parseFloat(pos[2]);
+            hitbox.width = Float.parseFloat(size[0]);
+            hitbox.thickness = Float.parseFloat(size[1]);
+            hitbox.height = Float.parseFloat(size[2]);
+            hitbox.type = Integer.valueOf(type);
+            hitboxArray.add(hitbox);
+        }
+        return hitboxArray;
+    }
+    public static Model createSimpleCube() {
+        ModelBuilder modelBuilder = new ModelBuilder();
+        return modelBuilder.createBox(
+            1f, 1f, 1f,
+            new Material(ColorAttribute.createDiffuse(Color.WHITE)),
+            VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
+        );
     }
 }

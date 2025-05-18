@@ -15,7 +15,6 @@ public class CostumeSound implements Disposable {
         this.sound = sound;
         this.isMuffled = isMuffled;
         this.maxVolume = maxVolume;
-        sound.setPosition(80);
     }
 
     public void play() {

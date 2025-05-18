@@ -18,6 +18,7 @@ public class TextRenderer implements Disposable {
     private float x, y;
     int unique_index;
     Color col1;
+    float sclae=1f;
     public boolean ispressed;
     public TextRenderer(BitmapFont font, String text, int index, Color color, float x, float y) {
         this.font = font;
@@ -31,6 +32,7 @@ public class TextRenderer implements Disposable {
         col1=color;
     }
     public void render(SpriteBatch batch) {
+        font.getData().setScale(sclae);
         float textHeight = font.getCapHeight();
         batch.setColor(Color.WHITE);
         float padding = 10;

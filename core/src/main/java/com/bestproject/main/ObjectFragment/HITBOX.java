@@ -4,9 +4,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 public class HITBOX {
-    public double x, y, z;
-    public double width, thickness, height;
-    public double rotation;
+    public float x, y, z;
+    public float width, thickness, height;
+    public float rotation;
     public int type=0;
     public static enum HITBOXTYPES {
         DEFAULT(0),
@@ -22,7 +22,7 @@ public class HITBOX {
             return value;
         }
     }
-    public HITBOX(double x, double y, double z, double width, double thickness, double height) {
+    public HITBOX(float x, float y, float z, float width, float thickness, float height) {
 
         this.x = x;
         this.y = y;
@@ -30,7 +30,7 @@ public class HITBOX {
         this.width = width;
         this.thickness = thickness;
         this.height=height;
-        this.rotation = 0.0;
+        this.rotation = 0.0f;
     }
     public void resize(float x, float y, float z){
         this.width+=x;
@@ -48,10 +48,10 @@ public class HITBOX {
     public int geType(){
         return type;
     }
-    public void setX(double x){
+    public void setX(float x){
         this.x=x;
     }
-    public void setY(double y){
+    public void setY(float y){
         this.y=y;
     }
     public double getBottom(){
@@ -60,11 +60,11 @@ public class HITBOX {
     public double getTop(){
         return z+height/2;
     }
-    public void setZ(double z){
+    public void setZ(float z){
         this.z=z;
     }
-    public void rotate(double degrees) {
-        rotation = (rotation + degrees) % 360.0;
+    public void rotate(float degrees) {
+        rotation = (rotation + degrees) % 360.0f;
     }
     public Point[] getCorners() {
         double halfWidth = width / 2;
@@ -387,11 +387,30 @@ public class HITBOX {
         double overlapX = Math.min(this.x + this.width / 2, other.x + other.width / 2) - Math.max(this.x - this.width / 2, other.x - other.width / 2);
         double overlapY = Math.min(this.y + this.thickness / 2, other.y + other.thickness / 2) - Math.max(this.y - this.thickness / 2, other.y - other.thickness / 2);
         if(getBottomTopOverlap(other)){
-            normals[1]*=-0.75f;
+            normals[1]*=-1f;
         }else if (overlapX < overlapY) {
-            normals[0]*=-0.75f;
+            normals[0]*=-1f;
         } else {
-            normals[2]*=-0.75f;
+            normals[2]*=-1f;
+        }
+
+        return true;
+    }
+    public boolean Bounce(HITBOX other, float[] normals, Vector3 force) {
+        if (!colliderectangles(other)) {
+            return false;
+        }
+        double overlapX = Math.min(this.x + this.width / 2, other.x + other.width / 2) - Math.max(this.x - this.width / 2, other.x - other.width / 2);
+        double overlapY = Math.min(this.y + this.thickness / 2, other.y + other.thickness / 2) - Math.max(this.y - this.thickness / 2, other.y - other.thickness / 2);
+        if(getTop()-0.1<=other.getBottom() && other.getBottom()<=getTop() && force.y*normals[1]<0){
+            normals[1]*=-1f;
+        } else if(getBottom()+0.1>=other.getTop() && other.getTop()>=getBottom() && force.y*normals[1]>0){
+            normals[1]*=-1;
+        }
+        else if (overlapX < overlapY) {
+            normals[0]*=-1f;
+        } else {
+            normals[2]*=-1f;
         }
 
         return true;

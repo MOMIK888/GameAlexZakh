@@ -1,12 +1,7 @@
 package com.bestproject.main.MovingObjects;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
@@ -26,7 +21,6 @@ public class Player extends MovingObject{
     public float lastangle=0;
     public HITBOX[] hitboxes;
     public int current_state=0;
-    public AnimationController animationController;
     public Vector3 unnormalizedMovement=new Vector3();
     public boolean isGravityAffected=true;
     HITBOX slideHitBox;
@@ -43,13 +37,9 @@ public class Player extends MovingObject{
     }
 
     public Player(Vector3 position) {
-        super(new ModelInstance(StaticBuffer.ui.getCurrentMoveset().getCharacterModel()), position);
-        modelInstance.transform.setToRotation(0,1,0,90);
-        modelInstance.transform.scale(0.3f,0.3f,0.3f);
-        hitboxes=new HITBOX[]{new HITBOX(position.x, position.z, position.y, 0.25,0.25,0.05f)};
-        slideHitBox=new HITBOX(position.x, position.z, position.y, 0.45,0.45,1.1f);
-        animationController=new AnimationController(modelInstance);
-        animationController.setAnimation("metarig|idle",-1);
+        super(null, position);
+        hitboxes=new HITBOX[]{new HITBOX(position.x, position.z, position.y, 0.25f,0.25f,0.05f)};
+        slideHitBox=new HITBOX(position.x, position.z, position.y, 0.45f,0.45f,1.1f);
         setPosition(position);
         islIneArt=true;
         StaticBuffer.setPlayer_coordinates(new int[]{(int) (position.z-1)/2,(int) (position.x-1)/2});
@@ -61,16 +51,11 @@ public class Player extends MovingObject{
     }
     @Override
     public void render(ModelBatch modelBatch, Environment environment){
-        modelBatch.render(modelInstance,environment);
-        if(isSliding){
-            StaticBuffer.dust.setPosition(position);
-            StaticBuffer.dust.render();
-            StaticBuffer.dust.update(GameCore.deltatime);
-        }
+        modelBatch.render(StaticBuffer.ui.getCurrentMoveset().getModelInstance(),environment);
     }
     @Override
     public void render(ModelBatch modelBatch){
-        modelBatch.render(modelInstance);
+        modelBatch.render(StaticBuffer.ui.getCurrentMoveset().getModelInstance());
     }
     @Override
     public void RenderHitboxes(){
@@ -101,21 +86,23 @@ public class Player extends MovingObject{
         climbing[0]=false;
         climbing[1]=false;
         isGravityAffected=true;
-        if(jumped>0){
-            jumped-=StaticQuickMAth.move(GameCore.deltatime);
-        }
     }
     @Override
     public void ATKHITBOXINTERRACTIONS(ATKHITBOX[] atkhitboxes) {
         if(atkhitboxes!=null){
             for(int i=0; i<atkhitboxes.length; i++){
-                if(!atkhitboxes[i].getisEnemy()) {
+                if(atkhitboxes[i].getisPlayer()) {
                     if (this.hitboxes[0].colliderectangles(atkhitboxes[i])) {
-                        if (invinFrames * atkhitboxes[i].invincibility_resetter(unique_index) <= 0f) {
+                        if (invinFrames <= 0f) {
                             StaticBuffer.ui.setCurrentMovesetHp(StaticBuffer.ui.getCurrentMovesetHp()-atkhitboxes[i].getSummDamage());
                             invinFrames = atkhitboxes[i].getFrames();
+                            if(Math.abs(atkhitboxes[i].getForce())>0.01f){
+                                this.force=this.force.add(StaticQuickMAth.calculateExplosionForce(this.position, atkhitboxes[i].getVectorPosition(),atkhitboxes[i].getForce()));
+                            }
                             atkhitboxes[i].invalidate(unique_index);
-
+                        } else if(Math.abs(atkhitboxes[i].getForce())>0.01f &&  atkhitboxes[i].contains(this.unique_index)){
+                            this.force=this.force.add(StaticQuickMAth.calculateExplosionForce(this.position, atkhitboxes[i].getVectorPosition(),atkhitboxes[i].getForce()));
+                            atkhitboxes[i].invalidate(this.unique_index);
                         }
                     }
                 }
@@ -177,7 +164,6 @@ public class Player extends MovingObject{
                     } else {
                         if(hitboxes[i].colliderectangles(this.hitboxes[0])){
                             if(hitboxes[i].getBottomTopOverlap(this.hitboxes[0])){
-                                movement.y=0;
                                 if(force.y<0){
                                     force.y=0;
                                 }
@@ -260,8 +246,8 @@ public class Player extends MovingObject{
     public void setPosition(Vector3 position) {
         Vector3 laspos=new Vector3(this.position);
         this.position.set(position);
-        if(modelInstance!=null){
-            modelInstance.transform.setTranslation(position);
+        if(StaticBuffer.ui.getCurrentMoveset().getModelInstance()!=null){
+            StaticBuffer.ui.getCurrentMoveset().getModelInstance().transform.setTranslation(position);
         } else{
             System.out.println("NULLMODEL");
         }
