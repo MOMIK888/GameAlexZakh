@@ -41,7 +41,7 @@ public class Mech extends Enemy{
     float rotationSpeed=240f;
     boolean isShooting=false;
     float shootingLen=0;
-    float hp=1f;
+    float hp=1000f;
     boolean isattacking=false;
     int attackType;
     float warningFrames;
