@@ -30,6 +30,7 @@ import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.bestproject.main.CameraRotation;
+import com.bestproject.main.CharacterUtils.MapQuickTravel;
 import com.bestproject.main.CostumeClasses.Click;
 import com.bestproject.main.CostumeClasses.CostumeShader;
 import com.bestproject.main.CostumeClasses.CostumeShaderProvider;
@@ -43,6 +44,7 @@ import com.bestproject.main.Maps.MapTest;
 import com.bestproject.main.Maps.Tavern;
 import com.bestproject.main.Maps.Village;
 import com.bestproject.main.MovingObjects.Player;
+import com.bestproject.main.ScreenEmulator;
 import com.bestproject.main.Skyboxes.Skybox;
 import com.bestproject.main.StaticBuffer;
 import com.bestproject.main.StaticQuickMAth;
@@ -56,8 +58,12 @@ public class GameCore implements Disposable, InputProcessor {
     public static float cameraRoationm=90;
     public static float cameraRoationX=0;
     public static Click lastclick=new Click();
+    public float DecalButtonTiring=0.0f;
+    MapQuickTravel mapQuickTravel=new MapQuickTravel();
     private ShapeRenderer shapeRenderer;
     static Vector3 additionalCooordinates=new Vector3();
+    public boolean displayQuickTravel=false;
+    public Array<ScreenEmulator> scm=new Array<>();
     Joystick joystick;
     public static float deltatime=0;
     static CameraRotation cameraRotation=new CameraRotation();
@@ -96,6 +102,10 @@ public class GameCore implements Disposable, InputProcessor {
             return false;
         }
         update();
+        cameraRotation.update();
+        if(DecalButtonTiring>=0){
+            DecalButtonTiring-=deltatime;
+        }
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl20.glEnable(GL20.GL_BLEND);
@@ -106,7 +116,7 @@ public class GameCore implements Disposable, InputProcessor {
             float[] val=cameraRotation.getAngles(cameraRotation.getVectors());
             camera.rotate(-val[0],0,1f,0f);
             camera.rotate(-val[1],0f,0f,1f);
-            camera.up.set(Vector3.Y);
+            camera.normalizeUp();
             Vector3 newpos=new Vector3(camera.position);
             Vector3 pickRay=camera.getPickRay(StaticBuffer.screenWidth/2f,StaticBuffer.screenHeight/2).direction;
             Vector2 jval=joystick.getDIrectionCreative();
@@ -116,7 +126,9 @@ public class GameCore implements Disposable, InputProcessor {
             fps.update(0.01f);
             camera.position.set(newpos);
         } else{
-            map.render(camera);
+            if(!displayQuickTravel) {
+                map.render(camera);
+            }
         }
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -124,6 +136,12 @@ public class GameCore implements Disposable, InputProcessor {
         shapeRenderer.end();
         StaticBuffer.ui.draw(StaticBuffer.spriteBatch, StaticBuffer.TestShapeRenderer);
         StaticBuffer.effectBuffer.render(StaticBuffer.decalBatch);
+        if(displayQuickTravel){
+            StaticBuffer.spriteBatch.begin();
+            mapQuickTravel.draw(StaticBuffer.spriteBatch);
+            StaticBuffer.spriteBatch.end();
+            mapQuickTravel.update(deltatime);
+        }
         if(TemporaryMapBuffer!=-1){
             if(TemporaryMapBuffer==0){
                 map=new Tavern();
@@ -137,7 +155,6 @@ public class GameCore implements Disposable, InputProcessor {
     public void update(){
         camera.update();
         StaticBuffer.ui.update();
-        cameraRotation.update();
     }
 
     @Override
@@ -167,7 +184,13 @@ public class GameCore implements Disposable, InputProcessor {
         additionalCooordinates=StaticQuickMAth.RotateAroundPivotX(additionalCooordinates,StaticBuffer.getPlayerCooordinates(),values[1]+cameraRoationX);
         camera.position.set(additionalCooordinates);
         camera.lookAt(StaticBuffer.getPlayerCooordinates());
-        camera.up.set(Vector3.Y);
+        Vector3 direction = new Vector3();
+        direction.set(StaticBuffer.getPlayerCooordinates()).sub(camera.position).nor();
+
+        Vector3 right = direction.cpy().crs(Vector3.Y).nor();
+        Vector3 up = right.cpy().crs(direction).nor();
+
+        camera.up.set(up);
         lastclick.update();
 
 
@@ -203,10 +226,17 @@ public class GameCore implements Disposable, InputProcessor {
         if(StaticBuffer.isCreative){
             StaticBuffer.creativeMode.onTouch(pointer,screenX,Gdx.graphics.getHeight()-screenY);
         }
-        if(joystick.contains(screenX,Screenheight-screenY)){
+        if(scm.size>0){
+            for(int i=0; i<scm.size; i++){
+                scm.get(i).OnTouch(screenX,Gdx.graphics.getHeight()-screenY,pointer);
+            }
+            scm.clear();
+        }
+        else if(joystick.contains(screenX,Screenheight-screenY)){
             joystick.update(screenX,Screenheight-screenY);
             joystick.setIndex(pointer);
             joystick.setTouched(true);
+            DecalButtonTiring=1f;
         } else if(StaticBuffer.ui.onTouch(screenX,Gdx.graphics.getHeight()-screenY,pointer)){
             return true;
         } else{
@@ -228,6 +258,9 @@ public class GameCore implements Disposable, InputProcessor {
         } if(cameraRotation.getCurrent_pointer()==pointer){
             cameraRotation.up();
         }
+        for(int i=0; i<scm.size; i++){
+            scm.get(i).OnUp(screenX,Gdx.graphics.getHeight()-screenY,pointer);
+        }
         StaticBuffer.ui.onUp(screenX,Gdx.graphics.getHeight()-screenY,pointer);
         return false;
     }
@@ -241,6 +274,7 @@ public class GameCore implements Disposable, InputProcessor {
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         if(joystick.getIndex()==pointer){
             joystick.update(screenX,Gdx.graphics.getHeight()-screenY);
+            DecalButtonTiring=1f;
         } else if(cameraRotation.getCurrent_pointer()==pointer){
             cameraRotation.drag(screenX,Screenheight-screenY);
         }

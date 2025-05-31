@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.bestproject.main.StaticBuffer;
 
+import java.awt.Rectangle;
+
 public class CharacterWidget {
     public static Color color;
     public Texture characterSprite;
@@ -33,5 +35,15 @@ public class CharacterWidget {
             spriteBatch.draw(characterSprite, x, y, w, w);
         }
     }
-    public void OnTouch(){}
+    public boolean OnTouch(int num, int totalMovesets, int pointer, float touchX, float touchY){
+        float w,x,y,h;
+        h=300*StaticBuffer.getScaleX();
+        w=100* StaticBuffer.getScaleX();
+        x=StaticBuffer.screenWidth-200*StaticBuffer.getScaleX();
+        y=StaticBuffer.screenHeight/2+StaticBuffer.getScaleY()*200+StaticBuffer.getScaleY()*100*num-StaticBuffer.getScaleY()*((float) (totalMovesets-1)/2)*100;
+        if(x<touchX && touchX<x+h && y<touchY && touchY<y+w){
+            return true;
+        }
+        return false;
+    }
 }

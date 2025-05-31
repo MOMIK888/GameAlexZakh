@@ -124,6 +124,9 @@ public class Moveset implements Disposable {
 
     public void setHp(float hp) {
         this.hp = hp;
+        if(hp<=0){
+            StaticBuffer.ui.AnalyzeLms();
+        }
     }
 
     public Model getCharacterModel() {

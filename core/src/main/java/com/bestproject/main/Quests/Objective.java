@@ -11,6 +11,7 @@ public class Objective {
     int takamount=3;
     float range;
     String task_name="";
+    int worldIndex=-1;
 
     public Objective(int[] kill, int[] collect, int[][] tasks, boolean iscompleted, Vector3 destination, float range) {
         this.kill = kill;
@@ -38,6 +39,37 @@ public class Objective {
             takamount-=1;
         }
     }
+    public int getWorldIndex(){
+        return worldIndex;
+    }
+    public Objective(int[] kill, int[] collect, int[][] tasks, boolean iscompleted, Vector3 destination, float range, int worldIndex) {
+        this.kill = kill;
+        this.collect = collect;
+        this.tasks = tasks;
+        this.iscompleted = iscompleted;
+        this.destination = destination;
+        this.range = range;
+        if(kill!=null) {
+            if (this.kill[0] <= this.kill[1]) {
+                takamount -= 1;
+
+            }
+        }
+        if(collect!=null) {
+            if (this.collect[0] <= this.collect[1]) {
+                takamount -= 1;
+            }
+        }
+        if(this.tasks!=null) {
+            if(this.tasks[0][0] <= this.tasks[0][1]){
+                takamount-=1;
+            }
+        } else {
+            takamount-=1;
+        }
+        this.worldIndex=worldIndex;
+    }
+
     public float getRange(){
         return range;
     }

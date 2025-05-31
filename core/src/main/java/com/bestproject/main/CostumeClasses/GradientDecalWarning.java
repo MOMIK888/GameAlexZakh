@@ -60,6 +60,9 @@ public class GradientDecalWarning implements Disposable {
         decal.setTextureRegion(new TextureRegion(gradientTexture));
         decalBatch.add(decal);
     }
+    public Texture getGradientTexture(){
+        return gradientTexture;
+    }
     public void setPosition(Vector3 pos){
         decal.setPosition(pos);
     }

@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.bestproject.main.Joystick;
+import com.bestproject.main.Maps.BossArena;
 import com.bestproject.main.Maps.CITY;
 import com.bestproject.main.Maps.ChunkedCity;
 import com.bestproject.main.Maps.Dungeon;
@@ -24,7 +25,7 @@ public class GameEngine implements Disposable {
     public static GameCore gameCore;
     public GameEngine(){
         gameCore=new GameCore();
-        gameCore.setMap(new ChunkedCity());
+        gameCore.setMap(new BossArena());
     }
     public void render(){
         gameCore.render();

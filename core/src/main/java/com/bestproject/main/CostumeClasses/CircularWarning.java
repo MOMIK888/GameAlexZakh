@@ -38,6 +38,12 @@ public class CircularWarning implements Disposable {
     public void render(DecalBatch decalBatch) {
         decalBatch.add(decal);
     }
+    public Decal getDecal(){
+        return decal;
+    }
+    public Texture getGradientTexture(){
+        return gradientTexture;
+    }
     public void setPosition(Vector3 pos){
         decal.setPosition(pos);
     }

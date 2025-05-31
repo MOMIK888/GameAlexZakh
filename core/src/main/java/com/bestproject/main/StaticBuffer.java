@@ -39,6 +39,7 @@ import com.bestproject.main.CreativeMode.CreativeMode;
 import com.bestproject.main.CreativeMode.ShowHitbox;
 import com.bestproject.main.Databases.DatabaseController;
 import com.bestproject.main.EffectDecals.EffectBuffer;
+import com.bestproject.main.FightUtils.DamageRenderer;
 import com.bestproject.main.Game.GameCore;
 import com.bestproject.main.Game.GameEngine;
 import com.bestproject.main.LoadScreen.FirstLoadingScreen;
@@ -96,6 +97,7 @@ public class StaticBuffer implements Disposable {
     public static TextRendererController textRenderer=new TextRendererController();
     //Утилиты для дебага и креатива!
     public static ShowHitbox showHitbox=new ShowHitbox();
+    public static DamageRenderer damageRenderer=new DamageRenderer(fonts[0]);
     public static boolean isCreative=false;
 
 
@@ -243,6 +245,16 @@ public class StaticBuffer implements Disposable {
         String[] assets=new String[]{"Models/Buildings/building.g3dj","Models/Buildings/concreteTile.g3dj","Models/Char3/character3.g3dj","Models/Buildings/bldg2.g3dj"
         };
         String[][] manager_of_assets=new String[][]{{"Models/Buildings/building.g3dj","Models/Buildings/concreteTile.g3dj","Models/Buildings/bldg2.g3dj"},{"Models/Char3/character3.g3dj"}};
+        GameEngine.getGameCore().setLoadingScreen(new FirstLoadingScreen(assets,assetManager,manager_of_assets));
+
+    }
+    public static void initialize_BossArena_models(){
+        current_enemies.clear();
+        soundManager.dispose();
+        currentModels.clear();
+        String[] assets=new String[]{"Models/Chunks/Chunk1/TowBigChunk1.g3dj","Models/Enemies/dreadnaught.g3dj"
+        };
+        String[][] manager_of_assets=new String[][]{{"Models/Chunks/Chunk1/TowBigChunk1.g3dj"},{"Models/Enemies/dreadnaught.g3dj"}};
         GameEngine.getGameCore().setLoadingScreen(new FirstLoadingScreen(assets,assetManager,manager_of_assets));
 
     }

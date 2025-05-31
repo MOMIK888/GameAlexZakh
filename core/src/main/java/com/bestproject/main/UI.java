@@ -25,9 +25,12 @@ public class UI implements Disposable {
     protected boolean isLocked=false;
     protected ImageButton settingsButton; //disposed
     Settins settins; //disposed
+    protected float LMC=1f;
+    boolean isLmc;
     public UI(){
         settins=new Settins();
         movesets=new ArrayList<>();
+        movesets.add(new PizzaGuy());
         movesets.add(new PizzaGuy());
         settingsButton=new ImageButton("Images/ButtonIcons/setting_button.png",0,970,120,120);
 
@@ -61,6 +64,13 @@ public class UI implements Disposable {
     }
     public boolean onTouch(float touchx, float touchy, int pointer){
         boolean ans=false;
+        for(int i=0; i<movesets.size();i++){
+            if(movesets.get(i).getCharacterWidget().OnTouch(i,movesets.size(),pointer,touchx,touchy)){
+                if(movesets.get(i).getHp()>0){
+                    current_moveset=i;
+                }
+            }
+        }
         if (StaticBuffer.isPaused) {
             ans=ans||settins.settingdsisPressed(touchx,touchy,pointer);
         } else if(settingsButton.onTouch(touchx,touchy,pointer)){
@@ -100,6 +110,8 @@ public class UI implements Disposable {
             StaticBuffer.textRenderer.render(spriteBatch);
         }
         spriteBatch.end();
+
+        StaticBuffer.questManager.draw(shapeRenderer,spriteBatch);
     }
     public void Render(ModelBatch modelBatch){
     }

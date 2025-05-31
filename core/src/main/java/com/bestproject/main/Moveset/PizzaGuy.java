@@ -232,15 +232,11 @@ public class PizzaGuy  extends Moveset{
                 //anim
             }
         }else if (StaticBuffer.ui.getState()==4) {
-            player.speed=4f;
+            player.speed=10f;
             player.hitboxes[0].setHeight(0.1f);
             modelInstance.transform.rotate(0, 1, 0, angle - player.lastangle);
             player.lastangle = angle;
             player.current_state=4;
-            controllers[0].setAnimation("metarig|slide",1);
-            StaticBuffer.dust.setPosition(new Vector3(StaticBuffer.getPlayerCooordinates()).add(new Vector3(0,0.3f,0)));
-            StaticBuffer.dust.update(StaticQuickMAth.move(GameCore.deltatime));
-            StaticBuffer.dust.render();
         }
         if(this.current_state==1){
             if(!controllers[0].inAction){
@@ -280,6 +276,7 @@ public class PizzaGuy  extends Moveset{
 
         } else if (isPunch && cooldowns[0]<=0){
             if(!isUlting) {
+                controllers[1].setAnimation("metarig.002|SlingShoot",1);
                 slingshot.Shoot(GameCore.camera.direction,StaticBuffer.getPlayerCooordinates()); //Заменить на координаты рогатки
                 cooldowns[0] = 0.1f;
                 cd=0.11f;
@@ -293,6 +290,7 @@ public class PizzaGuy  extends Moveset{
                 simoltanious_buttons.clear();
                 return;
             }
+            controllers[1].setAnimation("metarig.002|rocketLaunch",1);
             rocketLauncher.Shoot(StaticBuffer.getPlayerCooordinates(),GameCore.camera.direction);
             charge[0]=0;
             simoltanious_buttons.clear();
@@ -388,7 +386,6 @@ public class PizzaGuy  extends Moveset{
             }
             if(!player.isGravityAffected) {
                 if (jump) {
-                    System.out.println("Cvdv");
                     buttons.get(4).release();
                     current_state = 0;
                     jump = false;

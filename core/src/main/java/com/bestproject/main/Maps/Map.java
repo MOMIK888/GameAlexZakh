@@ -155,6 +155,9 @@ public class Map implements Disposable {
         int normalizedx=(int) Math.min(columns-1,Math.max(0,(position.x-1)/2));
         RearrangeMoving(movingObjects.get(normalizedx).get(normalizedy));
     }
+    public void setImpactFrames(float value){
+        impactFrames=value;
+    }
     public int[][] calculate_radius(int radius, int[] index_of_cell, int limit_x, int limit_y) {
         int x = index_of_cell[0];
         int y = index_of_cell[1];

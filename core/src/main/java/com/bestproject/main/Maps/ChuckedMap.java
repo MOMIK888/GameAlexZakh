@@ -310,7 +310,7 @@ public class ChuckedMap extends Map{
                 Gdx.gl.glEnable(GL20.GL_BLEND);
                 Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
                 Gdx.gl.glDepthMask(true);
-                skybox.render(camera);
+                skybox.render(camera,modelBatch);
                 modelBatch.begin(camera);
                 if (StaticBuffer.renderOverride != null) {
                     StaticBuffer.renderOverride.Render(null, null);

@@ -22,15 +22,13 @@ public class ColorFulSkybox implements Disposable {
     public Model skybox;
     private Texture skyboxTexture;
     public static ShaderProgram skyboxShader;
-    private Matrix4 transformMatrix;
-    private ModelInstance modelInstance;
-    ModelBatch mb=new ModelBatch();
+    public Vector3 position=new Vector3();
+
 
     public ColorFulSkybox(String Path, String TexturePath, float size) {
         StaticBuffer.assetManager.load(Path, Model.class);
         StaticBuffer.assetManager.finishLoading();
         skybox =  StaticBuffer.assetManager.get(Path,Model.class);
-        modelInstance=new ModelInstance(skybox);
         skyboxTexture=new Texture(TexturePath);
         skyboxShader = new ShaderProgram(
             Gdx.files.internal("shaders/skybox2.vert"),
@@ -41,10 +39,16 @@ public class ColorFulSkybox implements Disposable {
         }
     }
 
-    public void render(PerspectiveCamera camera) {
+    public void render(PerspectiveCamera camera, ModelBatch mb) {
         Gdx.gl.glDepthMask(false);
 
-        mb.begin(c`);
+        skyboxShader.begin();
+        skyboxShader.setUniformMatrix("u_projTrans", camera.combined);
+        skyboxShader.setUniformi("u_texture", 0);
+        skyboxShader.setUniformf("u_offset", position.x, position.y, position.z);
+        skyboxTexture.bind(0);
+        skybox.meshes.get(0).render(skyboxShader,GL20.GL_TRIANGLES);
+        skyboxShader.end();
         Gdx.gl.glDepthMask(true);
     }
     @Override
@@ -54,6 +58,6 @@ public class ColorFulSkybox implements Disposable {
         skyboxShader.dispose();
     }
     public void setPosition(Vector3 position){
-        modelInstance.transform.setToTranslation(position);
+        this.position.set(position);
     }
 }

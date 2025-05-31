@@ -249,7 +249,7 @@ public class CITY extends Map{
         int endColumn = columns-1;
         int startRow = 0;
         int endRow =rows-1;
-        skybox.render(camera);
+        skybox.render(camera,modelBatch);
         if(impactFrames>0){
             Gdx.gl.glClearColor(ImpactColor.r,ImpactColor.g,ImpactColor.b,ImpactColor.a);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -311,7 +311,7 @@ public class CITY extends Map{
                 Gdx.gl.glDepthMask(true);
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT
                     | GL20.GL_DEPTH_BUFFER_BIT);
-                skybox.render(camera);
+                skybox.render(camera,modelBatch);
             drawShadows(camera,startColumn,endColumn,startRow,endRow);
                 modelBatch.begin(camera);
                 Gdx.gl.glEnable(GL20.GL_BLEND);

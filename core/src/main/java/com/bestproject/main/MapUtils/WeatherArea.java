@@ -26,7 +26,7 @@ import com.bestproject.main.StaticQuickMAth;
 
 public class WeatherArea implements Disposable {
     public static Model weatherarea=null;
-    WeatherLayer2[] weatherLayer2s;
+    static WeatherLayer2[] weatherLayer2s;
     public static ModelInstance[] modelInstance;
     public static Shader shader;
     public static Texture spritesheet;
@@ -133,10 +133,6 @@ public class WeatherArea implements Disposable {
     }
     @Override
     public void dispose() {
-        weatherarea.dispose();
-        spritesheet.dispose();
-        weatherBatch.dispose();
-        shaderProgram.dispose();
 
     }
     public void switchWeather(int index){

@@ -16,7 +16,7 @@ public class CreativeMode implements Disposable {
     Array<HITBOX> temporaryHitboxBuffer = new Array<>();
     int currentHitboxIndex = 0;
     float precision=1f;
-    int currentMapIndex=2;
+    int currentMapIndex=3;
     int inversion=1;
     Array<Button> buttons = new Array<>();
 

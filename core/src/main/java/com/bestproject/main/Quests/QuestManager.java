@@ -65,8 +65,10 @@ public class QuestManager {
         quests.add(quest);
     }
     public void draw(ShapeRenderer shapeRenderer, SpriteBatch spriteBatch){
-        if(current_quest<quests.size() && current_quest>=0) {
-            quests.get(current_quest).drawObjectives(spriteBatch, shapeRenderer);
+        if(current_quest<quests.size() && current_quest>=0 && !quests.isEmpty()) {
+            if(quests.get(current_quest).objectives.size()>quests.get(current_quest).current_objective) {
+                quests.get(current_quest).drawObjectives(spriteBatch, shapeRenderer, StaticBuffer.fonts[0], quests.get(current_quest).objectives.get(quests.get(current_quest).current_objective), StaticBuffer.screenWidth, StaticBuffer.screenHeight);
+            }
         } else if (!quests.isEmpty()) {
             current_quest=quests.size()-1;
         }

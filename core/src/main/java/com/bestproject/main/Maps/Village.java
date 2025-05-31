@@ -2,6 +2,8 @@ package com.bestproject.main.Maps;
 
 import static com.bestproject.main.StaticBuffer.screenHeight;
 import static com.bestproject.main.StaticBuffer.screenWidth;
+
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.Environment;
@@ -17,9 +19,11 @@ import com.bestproject.main.MovingObjects.Player;
 import com.bestproject.main.Skyboxes.ColorFulSkybox;
 import com.bestproject.main.StaticBuffer;
 import com.bestproject.main.StaticObjects.EffectMap.StaticEffect;
+import com.bestproject.main.StaticObjects.FastTravel;
+
 public class Village extends SingleMeshMap{
     private float isInZone;
-    DialogueDecal dialogueDecal=new DialogueDecal(new Texture[]{new Texture(Gdx.files.internal("Images/2dTalk/ein.png"))},new Texture[1][0], new String[]{"Войти?"});
+    DialogueDecal dialogueDecal=new DialogueDecal(StaticBuffer.fonts[0],new Texture[0], "Войти?");
     public Village(){
         super(0);
         mapIndex=0;
@@ -31,6 +35,7 @@ public class Village extends SingleMeshMap{
         movingObjects2.add(new Player(new Vector3(0f,0.30f,8f)));
         staticObjects2.add(new StaticEffect(new Vector3(0.93f,1.4f, 6.790546f),uniqueTextures[0],1,1,0.5f));
         triggerZones.add(new HeightBasedRect[]{new HeightBasedRect(new Rectangle(0.63f,6.6f,0.6f,0.4f),4f,0)});
+        staticObjects2.add(new FastTravel(StaticBuffer.Testmodel, new Vector3(0.93f,0f, 10.790546f)));
         skybox=new ColorFulSkybox("Models/Skyboxes/skybox2.g3dj","Models/Skyboxes/SkyboxBlue.png",4f);
     }
     @Override
@@ -56,7 +61,7 @@ public class Village extends SingleMeshMap{
     protected void additionalRender(){
         if(isInZone>0){
             isInZone-= GameCore.deltatime;
-            dialogueDecal.render(StaticBuffer.decalBatch,new Vector3(0.63f,0.5f,6.6f));
+            dialogueDecal.render(StaticBuffer.decalBatch, GameCore.camera);
             if(dialogueDecal.getClick()){
                 GameEngine.getGameCore().setTemporaryMapBuffer(0);
             }
@@ -65,7 +70,8 @@ public class Village extends SingleMeshMap{
     @Override
     public void update(int a, int b, int c, int d){
         super.update(a,b,c,d);
-        dialogueDecal.update();
+        dialogueDecal.update(GameCore.deltatime);
+        dialogueDecal.setPosition(new Vector3(0.63f,0.5f,6.6f));
     }
 
 }

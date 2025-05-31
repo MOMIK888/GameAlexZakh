@@ -3,6 +3,7 @@ package com.bestproject.main;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.bestproject.main.Game.GameCore;
+import com.bestproject.main.Game.GameEngine;
 
 import java.awt.Point;
 
@@ -37,8 +38,10 @@ public class CameraRotation {
     }
     public void up(){
         current_pointer=-1;
-        if(touchLen<0.05f){
-            GameCore.lastclick.set(touchEnd.x,touchEnd.y);
+        if(!StaticBuffer.isCreative && !GameEngine.getGameCore().displayQuickTravel && !StaticBuffer.getIsPaused()) {
+            if (touchLen < 0.05f) {
+                GameCore.lastclick.set(touchEnd.x, touchEnd.y);
+            }
         }
     }
     public float[] getVectors(){

@@ -146,6 +146,8 @@ public class Player extends MovingObject{
                         if (hitboxes[i].getTopBottomMargin(this.hitboxes[0])) {
                            movement.y=0;
                            force.y =0;
+                           force.x=0;
+                           force.z=0;
                             isGravityAffected = false;
 
                         }
@@ -153,6 +155,8 @@ public class Player extends MovingObject{
                         if (hitboxes[i].getTopBottomMargin(this.hitboxes[0])) {
                             movement.y=0;
                             force.y =0;
+                            force.x=0;
+                            force.z=0;
                         } else {
                             boolean[] tempclimbing = hitboxes[i].blockMovementPlus(position, new Vector2(movement.x, movement.z), this.hitboxes[0]);
                             if (tempclimbing[0]) {
@@ -166,6 +170,8 @@ public class Player extends MovingObject{
                             if(hitboxes[i].getBottomTopOverlap(this.hitboxes[0])){
                                 if(force.y<0){
                                     force.y=0;
+                                    force.x=0;
+                                    force.z=0;
                                 }
                                 return;
                             }
