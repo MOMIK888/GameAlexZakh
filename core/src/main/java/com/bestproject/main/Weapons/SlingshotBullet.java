@@ -88,7 +88,7 @@ public class SlingshotBullet extends Attack  {
         direction=new Vector3(flingdir);
         StaticQuickMAth.normalizeSpeed(direction);
         lengh=2f;
-        modelInstance.transform.setToScaling(scale*0.3f,scale*0.3f,scale*0.3f);
+        modelInstance.transform.setToScaling(scale*0.2f,scale*0.2f,scale*0.2f);
         setPosition(position);
     }
     @Override

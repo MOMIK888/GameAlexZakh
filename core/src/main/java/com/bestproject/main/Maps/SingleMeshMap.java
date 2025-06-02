@@ -225,7 +225,9 @@ public class SingleMeshMap extends Map{
     @Override
     public void update(int startColumn, int endColumn, int startRow, int endRow){
         skybox.setPosition(StaticBuffer.getPlayerCooordinates());
-        weatherArea.update();
+        if(weatherArea!=null) {
+            weatherArea.update();
+        }
         player_coordinates= StaticBuffer.getPlayer_coordinates();
         for(int m = 0; m< staticObjects2.size; m++) {
             staticObjects2.get(m).update();
@@ -267,7 +269,9 @@ public class SingleMeshMap extends Map{
                     StaticBuffer.renderOverride.Render(null, null);
                 }
                 draw(startColumn, endColumn, startRow, endColumn, modelBatch);
-                weatherArea.render(modelBatch);
+                if(weatherArea!=null) {
+                    weatherArea.render(modelBatch);
+                }
                 modelBatch.end();
                 additionalRender();
                 if(weatherEffector!=null) {
@@ -333,7 +337,9 @@ public class SingleMeshMap extends Map{
                 StaticBuffer.renderOverride.Render(null, null);
             }
             draw(startColumn, endColumn, startRow, endColumn, modelBatch);
-            weatherArea.render(modelBatch);
+            if(weatherArea!=null) {
+                weatherArea.render(modelBatch);
+            }
             modelBatch.end();
             additionalRender();
             if(weatherEffector!=null) {

@@ -18,17 +18,31 @@ import com.bestproject.main.Maps.MapTest;
 import com.bestproject.main.Maps.Tavern;
 import com.bestproject.main.Maps.Village;
 import com.bestproject.main.Skyboxes.Skybox;
+import com.bestproject.main.StartingScreen;
 import com.bestproject.main.StaticQuickMAth;
 import com.bestproject.main.Tiles.StoneTile;
 
 public class GameEngine implements Disposable {
     public static GameCore gameCore;
+    StartingScreen startingScreen;
+    boolean isDisposed=false;
     public GameEngine(){
         gameCore=new GameCore();
-        gameCore.setMap(new BossArena());
+        gameCore.setMap(new Village());
+        startingScreen=new StartingScreen();
     }
     public void render(){
-        gameCore.render();
+        if(isDisposed) {
+            gameCore.render();
+        } else{
+            startingScreen.render();
+            isDisposed=startingScreen.gameStarted;
+            if(isDisposed){
+                gameCore.setInput();
+                startingScreen.dispose();
+                startingScreen=null;
+            }
+        }
         StaticQuickMAth.updateTime();
     }
     @Override

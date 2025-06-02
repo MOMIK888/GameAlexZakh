@@ -87,6 +87,9 @@ public class ATKHITBOX extends HITBOX{
         }
         return true;
     }
+    public float getCrit_multiplier(){
+        return crit_multiplier;
+    }
     public int invincibility_resetter(int index){
         if(!contains(index)){
             return 1;

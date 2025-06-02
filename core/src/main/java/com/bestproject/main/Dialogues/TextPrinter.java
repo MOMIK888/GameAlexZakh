@@ -1,5 +1,6 @@
 package com.bestproject.main.Dialogues;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -10,6 +11,7 @@ public class TextPrinter {
     private int currentCharIndex = 0;
     private int[] bounceOffsets;
     private int[] bounceDirections;
+
     private boolean isFinished = false;
     private float x, y;
     private float maxWidth;
@@ -21,7 +23,7 @@ public class TextPrinter {
     public TextPrinter(String text, float x, float y, float delay, float maxWidth, BitmapFont font, float screenWidth, float screenHeight) {
         this.font = font;
         this.charDelay = delay;
-        this.text = text + " ";
+        this.text = text;
         this.x = scaleX(x, screenWidth);
         this.y = scaleY(y, screenHeight);
         this.maxWidth = scaleX(maxWidth, screenWidth);
@@ -54,48 +56,55 @@ public class TextPrinter {
     public boolean isFinished() {
         return isFinished;
     }
-
-    public void draw(SpriteBatch batch, float delta) {
+    public void update(float delta){
         if (isFinished) return;
+        timer+=delta;
+    }
+    public void draw(SpriteBatch batch) {
+        font.getData().setScale(1f);
+        font.setColor(Color.WHITE);
+        batch.setColor(Color.WHITE);
+        if(true) {
 
-        timer += delta;
-        while (timer >= charDelay && currentCharIndex < text.length()) {
-            timer -= charDelay;
-            currentCharIndex++;
-            if (currentCharIndex >= text.length()) {
-                isFinished = true;
-            }
-        }
-
-        float drawX = x;
-        float drawY = y;
-        StringBuilder currentLine = new StringBuilder();
-
-        for (int i = 0; i < currentCharIndex; i++) {
-            char ch = text.charAt(i);
-            currentLine.append(ch);
-
-            float lineWidth = font.getCache().setText(currentLine.toString(),0,0).width;
-            if (lineWidth > maxWidth && currentLine.length() > 1) {
-                currentLine = new StringBuilder(currentLine.substring(currentLine.lastIndexOf(" ") + 1));
-                drawY -= lineHeight;
-                drawX = x;
-            }
-
-            float charWidth = font.getCache().setText(String.valueOf(ch),0,0).width;
-            font.draw(batch, String.valueOf(ch), drawX, drawY + bounceOffsets[i]);
-            if (bounceOffsets[i] != 0 || i == currentCharIndex - 1) {
-                bounceOffsets[i] += bounceDirections[i] * (int) scaleY(60 * delta, 1080);
-                int bounceLimit = (int) scaleY(10, 1080);
-                if (bounceOffsets[i] >= bounceLimit || bounceOffsets[i] <= -bounceLimit) {
-                    bounceDirections[i] *= -1;
-                }
-                if (bounceOffsets[i] == 0) {
-                    bounceDirections[i] = 1;
+            while (timer >= charDelay && currentCharIndex < text.length()) {
+                timer -= charDelay;
+                currentCharIndex++;
+                if (currentCharIndex >= text.length()) {
+                    isFinished = true;
                 }
             }
+            if(currentCharIndex>text.length()-1) currentCharIndex=text.length()-1;
 
-            drawX += charWidth;
+            float drawX = x;
+            float drawY = y;
+            StringBuilder currentLine = new StringBuilder();
+
+            for (int i = 0; i < currentCharIndex; i++) {
+                char ch = text.charAt(i);
+                currentLine.append(ch);
+
+                float lineWidth = font.getCache().setText(currentLine.toString(), 0, 0).width;
+                if (lineWidth > maxWidth && currentLine.length() > 1) {
+                    currentLine = new StringBuilder(currentLine.substring(currentLine.lastIndexOf(" ") + 1));
+                    drawY -= lineHeight;
+                    drawX = x;
+                }
+
+                float charWidth = font.getCache().setText(String.valueOf(ch), 0, 0).width;
+                font.draw(batch, String.valueOf(ch), drawX, drawY + bounceOffsets[i]);
+                if (bounceOffsets[i] != 0 || i == currentCharIndex - 1) {
+                    bounceOffsets[i] += bounceDirections[i] * (int) scaleY(60, 1080);
+                    int bounceLimit = (int) scaleY(10, 1080);
+                    if (bounceOffsets[i] >= bounceLimit || bounceOffsets[i] <= -bounceLimit) {
+                        bounceDirections[i] *= -1;
+                    }
+                    if (bounceOffsets[i] == 0) {
+                        bounceDirections[i] = 1;
+                    }
+                }
+
+                drawX += charWidth;
+            }
         }
     }
 

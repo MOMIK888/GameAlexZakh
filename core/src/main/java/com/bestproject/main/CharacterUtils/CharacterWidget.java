@@ -11,6 +11,8 @@ import java.awt.Rectangle;
 
 public class CharacterWidget {
     public static Color color;
+    public static Color hpColor=new Color(Color.GREEN);
+    public static Color hpDeadColor=new Color(Color.LIGHT_GRAY);
     public Texture characterSprite;
     public CharacterWidget(Texture texture){
         this.characterSprite=texture;
@@ -19,12 +21,23 @@ public class CharacterWidget {
     }
     public void draw(ShapeRenderer shapeRenderer, int num, int totalMovesets){
         float w,x,y;
+        float hp, maxHp;
+        hp=StaticBuffer.ui.movesets.get(num).getHp();
+        maxHp=StaticBuffer.ui.movesets.get(num).getMaxHp();
         w=100* StaticBuffer.getScaleX();
         x=StaticBuffer.screenWidth-200*StaticBuffer.getScaleX();
         y=StaticBuffer.screenHeight/2+StaticBuffer.getScaleY()*200+StaticBuffer.getScaleY()*100*num-StaticBuffer.getScaleY()*((float) (totalMovesets-1)/2)*100;
         shapeRenderer.setColor(color);
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.rect(x,y,300*StaticBuffer.getScaleX(),w);
+
+        shapeRenderer.setColor(hpDeadColor);
+        shapeRenderer.rect(x+50,y+w/2,100*StaticBuffer.getScaleX(),StaticBuffer.getScaleX()*20);
+        if(hp>0){
+            shapeRenderer.setColor(hpColor);
+            shapeRenderer.rect(x+50,y+w/2,100*StaticBuffer.getScaleX()*(hp/maxHp),StaticBuffer.getScaleX()*20);
+
+        }
     }
     public void draw(SpriteBatch spriteBatch, int num){
         if(characterSprite!=null) {

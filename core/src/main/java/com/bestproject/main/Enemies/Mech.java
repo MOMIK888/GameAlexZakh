@@ -18,6 +18,7 @@ import com.bestproject.main.Ais.MechAI;
 import com.bestproject.main.Attacks.FlameRIng;
 import com.bestproject.main.Attacks.MechBullet;
 import com.bestproject.main.Attacks.Slash;
+import com.bestproject.main.CharacterUtils.DialogueScreen;
 import com.bestproject.main.Game.GameCore;
 import com.bestproject.main.Game.GameEngine;
 import com.bestproject.main.MapRender.HitboxAndMappingUtils;
@@ -41,7 +42,7 @@ public class Mech extends Enemy{
     float rotationSpeed=240f;
     boolean isShooting=false;
     float shootingLen=0;
-    float hp=1000f;
+    float hp=10000f;
     boolean isattacking=false;
     int attackType;
     float warningFrames;
@@ -50,7 +51,10 @@ public class Mech extends Enemy{
     float ShootLen=1f;
 
     public Mech(Vector3 position) {
-        super(new ModelInstance(StaticBuffer.current_enemies.get(0)), position.add(0f,0.8f,0f));
+        super(new ModelInstance(StaticBuffer.current_enemies.get(0)), position.add(10f,0.8f,0f));
+        DialogueScreen dialogueScreen = new DialogueScreen(new String[]{"Что...", "Это...","Такое..."});
+        GameCore.screenSpaceSim = dialogueScreen;
+        dialogueScreen.afterInit();
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
         pixmap.fill();
@@ -92,7 +96,7 @@ public class Mech extends Enemy{
                 if (atkhitboxes[i].getisEnemy()) {
                     if(vulnerable && vulnerableHitbox.colliderectangles(atkhitboxes[i])){
                         if (invinFrames * atkhitboxes[i].invincibility_resetter(unique_index) <= 0f) {
-                            float damage = atkhitboxes[i].getSummDamage() * 1.5f;
+                            float damage = atkhitboxes[i].getSummDamage() * atkhitboxes[i].getCrit_multiplier();
                             hp -= (int) damage;
 
                             StaticBuffer.damageRenderer.showDamage(new Vector3(this.position).lerp(StaticBuffer.getPlayerCooordinates(), 0.6f), damage, crit);

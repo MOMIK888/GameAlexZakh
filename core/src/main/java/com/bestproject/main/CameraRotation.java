@@ -39,7 +39,7 @@ public class CameraRotation {
     public void up(){
         current_pointer=-1;
         if(!StaticBuffer.isCreative && !GameEngine.getGameCore().displayQuickTravel && !StaticBuffer.getIsPaused()) {
-            if (touchLen < 0.05f) {
+            if (touchLen < 0.1f) {
                 GameCore.lastclick.set(touchEnd.x, touchEnd.y);
             }
         }

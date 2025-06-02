@@ -2,6 +2,7 @@ package com.bestproject.main.Game;
 
 import static com.bestproject.main.StaticBuffer.screenHeight;
 import static com.bestproject.main.StaticBuffer.screenWidth;
+import static com.bestproject.main.StaticBuffer.spriteBatch;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -30,14 +31,17 @@ import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.bestproject.main.CameraRotation;
+import com.bestproject.main.CharacterUtils.DialogueScreen;
 import com.bestproject.main.CharacterUtils.MapQuickTravel;
 import com.bestproject.main.CostumeClasses.Click;
 import com.bestproject.main.CostumeClasses.CostumeShader;
 import com.bestproject.main.CostumeClasses.CostumeShaderProvider;
 import com.bestproject.main.CostumeClasses.FPS;
+import com.bestproject.main.CostumeClasses.ScreenSpaceSim;
 import com.bestproject.main.Joystick;
 import com.bestproject.main.LoadScreen.FirstLoadingScreen;
 import com.bestproject.main.LoadScreen.LoadingScreen;
+import com.bestproject.main.Maps.BossArena;
 import com.bestproject.main.Maps.Dungeon;
 import com.bestproject.main.Maps.Map;
 import com.bestproject.main.Maps.MapTest;
@@ -60,6 +64,7 @@ public class GameCore implements Disposable, InputProcessor {
     public static Click lastclick=new Click();
     public float DecalButtonTiring=0.0f;
     MapQuickTravel mapQuickTravel=new MapQuickTravel();
+    public static ScreenSpaceSim screenSpaceSim=null;
     private ShapeRenderer shapeRenderer;
     static Vector3 additionalCooordinates=new Vector3();
     public boolean displayQuickTravel=false;
@@ -72,6 +77,7 @@ public class GameCore implements Disposable, InputProcessor {
     public static int TemporaryMapBuffer=-1;
     int Screenheight=Gdx.graphics.getHeight();
     public LoadingScreen loadingScreen;
+    static boolean isStarting=false;
     Map map;
     public GameCore() {
         StaticShaders.init();
@@ -90,8 +96,20 @@ public class GameCore implements Disposable, InputProcessor {
         StaticBuffer.effectBuffer.update();
         StaticBuffer.textRenderer.add(new FPS(StaticBuffer.fonts[0],"", Color.BLACK,Gdx.graphics.getWidth()-200,1000 ));
     }
+    public void setInput(){
+        Gdx.input.setInputProcessor(this);
+    }
     public boolean render() {
+        if (isStarting){
+            isStarting=false;
+            DialogueScreen dialogueScreen=new DialogueScreen(new String[]{"... ", "Не могу поверить они отправили меня сюда...", "Я, конечно, слышал о том, что экзамены по магии надо сдавать вдалеке от дома.", "Но это просто смешно!", "ТЫСЯЧА километров ради того, чтобы приехать в какою-то деревню...","Ладно, время выдвигаться и наконец покончить с этим как можно быстрее..."});
+            dialogueScreen.afterInit();
+            screenSpaceSim=dialogueScreen;
+
+        }
+
         deltatime=Gdx.graphics.getDeltaTime();
+        StaticBuffer.questManager.update();
         if(StaticBuffer.isIsLoading()){
             loadingScreen.Update(StaticBuffer.assetManager);
             loadingScreen.DrawAssets();
@@ -131,25 +149,50 @@ public class GameCore implements Disposable, InputProcessor {
             }
         }
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        if(screenSpaceSim!=null){
+            screenSpaceSim.render(shapeRenderer);
+
+        }
         Gdx.gl.glEnable(GL20.GL_BLEND);
         joystick.draw(shapeRenderer);
         shapeRenderer.end();
         StaticBuffer.ui.draw(StaticBuffer.spriteBatch, StaticBuffer.TestShapeRenderer);
         StaticBuffer.effectBuffer.render(StaticBuffer.decalBatch);
         if(displayQuickTravel){
+            mapQuickTravel.update(deltatime);
+            shapeRenderer.setAutoShapeType(true);
+            shapeRenderer.begin();
+            shapeRenderer.setAutoShapeType(true);
             StaticBuffer.spriteBatch.begin();
             mapQuickTravel.draw(StaticBuffer.spriteBatch);
             StaticBuffer.spriteBatch.end();
-            mapQuickTravel.update(deltatime);
+            shapeRenderer.end();
+
         }
         if(TemporaryMapBuffer!=-1){
             if(TemporaryMapBuffer==0){
                 map=new Tavern();
             } else if(TemporaryMapBuffer==1){
-                map=new Village();
+                if(map.getUniqueIndex()!=0) {
+                    map = new Village();
+                }
+            } else if(TemporaryMapBuffer==2){
+                if(map.getUniqueIndex()!=3) {
+                    map = new BossArena();
+                }
             }
             TemporaryMapBuffer=-1;
         }
+        StaticBuffer.spriteBatch.begin();
+        if(screenSpaceSim!=null){
+            screenSpaceSim.render(spriteBatch);
+            screenSpaceSim.update(deltatime);
+            if(screenSpaceSim.expire()){
+                screenSpaceSim=null;
+            }
+
+        }
+        StaticBuffer.spriteBatch.end();
         return true;
     }
     public void update(){
@@ -301,6 +344,9 @@ public class GameCore implements Disposable, InputProcessor {
     }
     public void setTemporaryMapBuffer(int mapIndex){
         TemporaryMapBuffer=mapIndex;
+    }
+    public static void setStartingCutscene(){
+        isStarting=true;
     }
 }
 class CameraController {

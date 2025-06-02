@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.bestproject.main.CostumeClasses.ImageButton;
+import com.bestproject.main.Game.GameCore;
 import com.bestproject.main.Game.GameEngine;
 import com.bestproject.main.ScreenEmulator;
 import com.bestproject.main.StaticBuffer;
@@ -28,8 +29,8 @@ public class MapQuickTravel implements ScreenEmulator {
         textureX=mapTexture.getWidth();
         textureY=mapTexture.getHeight();
         points=new Array<>();
-        points.add(new Vector2(1000,100));
-        points.add(new Vector2(500,100));
+        points.add(new Vector2(1500,300));
+        points.add(new Vector2(500,300));
         pointerTexture=new Texture(Gdx.files.internal("Images/Ui/testTexture.png"));
         buttons=new ImageButton[]{new ImageButton("Images/Ui/testTexture.png",100,100,200,200)};
     }
@@ -41,7 +42,17 @@ public class MapQuickTravel implements ScreenEmulator {
             GameEngine.gameCore.DecalButtonTiring=1;
         }
         for (int i=0; i<points.size; i++){
-            
+            if(points.get(i).x<screenX && screenX<points.get(i).x+100){
+                if(points.get(i).y<screenY && screenY<points.get(i).y+100){
+                    GameEngine.getGameCore().displayQuickTravel=false;
+                    GameEngine.gameCore.DecalButtonTiring=1;
+                    if(i==0){
+                        GameCore.TemporaryMapBuffer=2;
+                    } else{
+                        GameCore.TemporaryMapBuffer=1;
+                    }
+                }
+            }
         }
     }
     @Override

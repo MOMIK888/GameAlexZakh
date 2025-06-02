@@ -256,20 +256,27 @@ public class StaticBuffer implements Disposable {
         };
         String[][] manager_of_assets=new String[][]{{"Models/Chunks/Chunk1/TowBigChunk1.g3dj"},{"Models/Enemies/dreadnaught.g3dj"}};
         GameEngine.getGameCore().setLoadingScreen(new FirstLoadingScreen(assets,assetManager,manager_of_assets));
+        soundManager.dispose();
+        assetManager.load("Sounds/Music/IntoTheFire.mp3", Music.class);
+        assetManager.finishLoading();
+        Music music=assetManager.get("Sounds/Music/IntoTheFire.mp3");
+        soundManager.addConstantSound("theme",new CostumeSound(music, true, 20f));
+        soundManager.playSoundConstant("theme");
 
     }
     public static void initialize_Village_models(){
         current_enemies.clear();
-        assetManager.load("Sounds/Music/song2.mp3", Music.class);
-        assetManager.finishLoading();
-        soundManager.dispose();
-        soundManager.addConstantSound("theme",new CostumeSound(assetManager.get("Sounds/Music/song2.mp3"), false, 20f));
-        soundManager.playSoundConstant("theme");
         currentModels.clear();
         String[] assets=new String[]{"Models/SingleMeshMaps/village.g3dj"
         };
         String[][] manager_of_assets=new String[][]{{"Models/SingleMeshMaps/village.g3dj"},{}};
         GameEngine.getGameCore().setLoadingScreen(new FirstLoadingScreen(assets,assetManager,manager_of_assets));
+        assetManager.load("Sounds/Music/song2.mp3", Music.class);
+        assetManager.finishLoading();
+        soundManager.dispose();
+        Music music=assetManager.get("Sounds/Music/song2.mp3");
+        soundManager.addConstantSound("theme",new CostumeSound(music, true, 20f));
+        soundManager.playSoundConstant("theme");
     }
     public static void initialize_Tavern_models(){
         current_enemies.clear();

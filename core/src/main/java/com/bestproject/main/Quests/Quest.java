@@ -90,12 +90,13 @@ public class Quest {
             float textY = y + rectHeight * 2 - 40;
             int offset = 0;
             int[] kill = objective.getKill();
-            if (kill[0] > kill[1]) {
+
+            if (kill!=null && kill.length>1 && kill[0] > kill[1]) {
                 font.draw(batch, "Убийства: " + kill[0] + "/" + kill[1], x + 10, textY - offset * 20);
                 offset++;
             }
             int[] collect = objective.getCollect();
-            if (collect[0] > collect[1]) {
+            if (collect!=null && collect.length>1 &&collect[0] > collect[1]) {
                 font.draw(batch, "Сбор: " + collect[0] + "/" + collect[1], x + 10, textY - offset * 20);
                 offset++;
             }
@@ -104,6 +105,9 @@ public class Quest {
                 font.draw(batch, objective.task_name, x + 10, textY - offset * 20);
             }
             batch.end();
+            if(tasks==null && collect==null && kill==null && (GameEngine.gameCore.getMap().getUniqueIndex()==objective.worldIndex || objective.worldIndex==-1)){
+                isCompleted=true;
+            }
             font.setColor(1,1,1,1f);
         }
     }

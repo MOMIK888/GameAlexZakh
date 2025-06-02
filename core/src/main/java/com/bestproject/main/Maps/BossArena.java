@@ -31,6 +31,7 @@ public class BossArena extends SingleMeshMap{
         skybox=new ColorFulSkybox("Models/Skyboxes/skybox2.g3dj","Models/Skyboxes/SkyboxBlue.png",4f);
         singleObjectMap.scale(0.01f,0.01f,0.01f);
         this.weatherEffector=null;
+        this.weatherArea=null;
     }
     @Override
     public void LoadDependencies(){
@@ -42,7 +43,7 @@ public class BossArena extends SingleMeshMap{
         modelBatch=new ModelBatch();
         gridinit();
         environment = new Environment();
-        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.5f, 0.5f, 0.5f, 0f));
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.7f, 0.7f, 0.7f, 1f));
     }
     @Override
     public void check(){

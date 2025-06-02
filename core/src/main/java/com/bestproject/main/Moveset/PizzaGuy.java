@@ -1,12 +1,18 @@
 package com.bestproject.main.Moveset;
 
+import static com.bestproject.main.Game.GameCore.camera;
+
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.model.Node;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.bestproject.main.CharacterUtils.Elytra;
@@ -24,6 +30,7 @@ public class PizzaGuy  extends Moveset{
     Color[] colors; //undisposable
     public boolean jump=false;
     public boolean dash;
+    float speedMul=1f;
     public boolean isUlting=false;
     public boolean flying=false;
     public boolean isOnground=false;
@@ -43,11 +50,13 @@ public class PizzaGuy  extends Moveset{
         buttons.add(new ImageButton("Images/ButtonIcons/ult1.png",1600,50,120,120));
         buttons.add(new ImageButton("Images/ButtonIcons/dash.png",2150,280,170,170));
         buttons.add(new ImageButton("Images/ButtonIcons/dash.png",2150,100,100,100));
+        StaticBuffer.constantAssets.load("Sounds/Music/LMC.mp3", Music.class);
         StaticBuffer.constantAssets.load("Models/Attacks/blast.g3dj",Model.class);
         StaticBuffer.constantAssets.load("Models/Char4/PizzaGuy.g3dj", Model.class);
         StaticBuffer.constantAssets.load("Models/Minor_models/flintlock.g3dj", Model.class);
         StaticBuffer.constantAssets.finishLoading();
         characterModel=StaticBuffer.constantAssets.get("Models/Char4/PizzaGuy.g3dj", Model.class);
+        LMC=StaticBuffer.constantAssets.get("Sounds/Music/LMC.mp3");
         attacks=null;
         hp=100f;
         elytra=new Elytra();
@@ -198,9 +207,10 @@ public class PizzaGuy  extends Moveset{
 
     @Override
     public void PlayerInterrractions(Player player) {
+        modelInstance.calculateTransforms();
         float deltatime = GameEngine.getGameCore().getDeltatime();
         Vector2 vec=GameEngine.getGameCore().getJoystick().getDirection();
-        player.unnormalizedMovement.set(StaticQuickMAth.move(vec.x*deltatime*player.speed),0, StaticQuickMAth.move(-vec.y*deltatime*player.speed));
+        player.unnormalizedMovement.set(StaticQuickMAth.move(vec.x*deltatime*player.speed*speedMul),0, StaticQuickMAth.move(-vec.y*deltatime*player.speed*speedMul));
         float angle = vec.angle();
         float multiplier=1f;
         player.hitboxes[0].setHeight(1.4f);
@@ -212,7 +222,15 @@ public class PizzaGuy  extends Moveset{
                 controllers[0].setAnimation("metarig.002|walk", -1);
                 controllers[1].setAnimation("metarig.002|WalkArms",-1);
             }
-            modelInstance.transform.rotate(0, 1, 0, angle - player.lastangle);
+
+            Vector3 camDir = new Vector3(player.unnormalizedMovement).nor();
+            Vector3 characterForward = new Vector3(0, 0, -1);
+            Quaternion rotation = new Quaternion().setFromCross(characterForward, camDir);
+            Vector3 flatCamDir = new Vector3(-camDir.x, 0, -camDir.z).nor();
+            rotation.setFromCross(characterForward, flatCamDir);
+            modelInstance.transform.idt();
+            modelInstance.transform.rotate(rotation);
+            modelInstance.transform.scale(0.08f, 0.08f, 0.08f);
             player.lastangle = angle;
         }else if(StaticBuffer.ui.getState()==0){
             player.speed=1f;
@@ -272,12 +290,30 @@ public class PizzaGuy  extends Moveset{
         if (simoltanious_buttons.contains(2)) {
             charge[1]=0;
             simoltanious_buttons.clear();
-            //Ульта
+            for(int i=0; i<StaticBuffer.ui.movesets.size(); i++){
+                if(StaticBuffer.ui.movesets.get(i).getHp()>0) {
+                    StaticBuffer.ui.movesets.get(i).heal(maxHp / 100f * 20f);
+                }
+            }
 
         } else if (isPunch && cooldowns[0]<=0){
             if(!isUlting) {
                 controllers[1].setAnimation("metarig.002|SlingShoot",1);
-                slingshot.Shoot(GameCore.camera.direction,StaticBuffer.getPlayerCooordinates()); //Заменить на координаты рогатки
+                Vector3 camDir = new Vector3(camera.direction).nor();
+                Vector3 characterForward = new Vector3(0, 0, -1);
+                Quaternion rotation = new Quaternion().setFromCross(characterForward, camDir);
+                Vector3 flatCamDir = new Vector3(-camDir.x, 0, -camDir.z).nor();
+                rotation.setFromCross(characterForward, flatCamDir);
+                modelInstance.transform.idt();
+                modelInstance.transform.rotate(rotation);
+                modelInstance.transform.scale(0.08f, 0.08f, 0.08f);
+                String boneName = "slingBase";
+                Node bone = modelInstance.getNode(boneName, true);
+                modelInstance.calculateTransforms(); // update bone transforms
+                Matrix4 boneWorldMatrix = new Matrix4(modelInstance.transform).mul(bone.globalTransform);
+                Vector3 boneWorldPos = new Vector3();
+                boneWorldMatrix.getTranslation(boneWorldPos);
+                slingshot.Shoot(camera.direction, boneWorldPos.add(StaticBuffer.getPlayerCooordinates()));
                 cooldowns[0] = 0.1f;
                 cd=0.11f;
                 isPunch=false;
@@ -291,7 +327,7 @@ public class PizzaGuy  extends Moveset{
                 return;
             }
             controllers[1].setAnimation("metarig.002|rocketLaunch",1);
-            rocketLauncher.Shoot(StaticBuffer.getPlayerCooordinates(),GameCore.camera.direction);
+            rocketLauncher.Shoot(StaticBuffer.getPlayerCooordinates(), camera.direction);
             charge[0]=0;
             simoltanious_buttons.clear();
         } else if(simoltanious_buttons.contains(3) && cooldowns[1]<=0){
@@ -306,6 +342,7 @@ public class PizzaGuy  extends Moveset{
     public void ActivateLms(){
         super.ActivateLms();
         damageMultiplier=1.5f;
+        speedMul=2f;
     }
     @Override
     public void forceNullification(Player player){

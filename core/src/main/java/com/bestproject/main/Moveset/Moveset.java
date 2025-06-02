@@ -1,9 +1,12 @@
 package com.bestproject.main.Moveset;
 
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
@@ -40,11 +43,14 @@ public class Moveset implements Disposable {
     protected float[] cooldowns=new float[]{0,0,0,0};
     protected int[][] Bitmap_button_coordinates;
     public float cd=0;
+    float healingBatch=-1;
     protected Vector3 lock_omn_coordinates=new Vector3();
     protected CharacterWidget characterWidget;
     public float damageMultiplier=0f;
     boolean isPunch=false;
     boolean lastManstanding=false;
+    static Color HealingColor=new Color(Color.GREEN);
+    Music LMC;
     int current_state=0; //0-стачичный 1-Атака 2-Способность, 3-ульта 4-перекат
     public Moveset(){
         ability_cooldown=0;
@@ -57,6 +63,12 @@ public class Moveset implements Disposable {
     }
     public void DrawMovesetWidget(ShapeRenderer shapeRenderer){
 
+    }
+    public void renderDecals(DecalBatch decalBatch){
+        if(healingBatch>0){
+            StaticBuffer.damageRenderer.showDamage(StaticBuffer.getPlayerCooordinates(),healingBatch, HealingColor);
+            healingBatch=-100;
+        }
     }
     @Override
     public void dispose() {
@@ -71,6 +83,10 @@ public class Moveset implements Disposable {
     }
     public void ActivateLms(){
         lastManstanding=true;
+        if(LMC!=null){
+            StaticBuffer.soundManager.StopAllCons();
+            LMC.play();
+        }
     }
     public void resetLMS(){
         lastManstanding=false;
@@ -127,6 +143,18 @@ public class Moveset implements Disposable {
         if(hp<=0){
             StaticBuffer.ui.AnalyzeLms();
         }
+    }
+    public void heal(float healing){
+        if(hp+healing>maxHp){
+            healingBatch=maxHp-hp;
+            hp=maxHp;
+        } else{
+            hp+=healing;
+            healingBatch=healing;
+        }
+    }
+    public float getMaxHp(){
+        return maxHp;
     }
 
     public Model getCharacterModel() {

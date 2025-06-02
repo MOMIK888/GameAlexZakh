@@ -52,6 +52,7 @@ public class Player extends MovingObject{
     @Override
     public void render(ModelBatch modelBatch, Environment environment){
         modelBatch.render(StaticBuffer.ui.getCurrentMoveset().getModelInstance(),environment);
+        StaticBuffer.ui.getCurrentMoveset().renderDecals(StaticBuffer.decalBatch);
     }
     @Override
     public void render(ModelBatch modelBatch){

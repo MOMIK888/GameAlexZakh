@@ -17,18 +17,18 @@ import com.bestproject.main.StaticQuickMAth;
 import org.w3c.dom.Text;
 
 public class VoiceLine {
-    protected String[] text;
-    protected BitmapFont font;
-    protected boolean isFinished = false;
-    protected int index = 0;
-    protected float letterTimer = 0f;
-    protected int letterIndex = 0;
+    public String[] text;
+    public BitmapFont font;
+    public boolean isFinished = false;
+    public int index = 0;
+    public float letterTimer = 0f;
+    public int letterIndex = 0;
     protected float letterDelay = 0.05f;
     protected static FrameBuffer frameBuffer;
     protected Texture textTexture;
     protected Decal textDecal;
     protected static SpriteBatch fboBatch;
-    protected boolean needsUpdate = true;
+    public boolean needsUpdate = true;
 
     public VoiceLine(BitmapFont font, String[] text) {
         this.font = font;

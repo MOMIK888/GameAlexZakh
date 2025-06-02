@@ -10,11 +10,23 @@ public class CostumeSound implements Disposable {
     private final boolean isMuffled;
     private final float maxVolume;
     private long soundId;
+    public int soundStrengh=1;
 
     public CostumeSound(Music sound, boolean isMuffled, float maxVolume) {
         this.sound = sound;
         this.isMuffled = isMuffled;
         this.maxVolume = maxVolume;
+        sound.setVolume(1);
+        sound.setLooping(true);
+    }
+    public CostumeSound(Music sound, boolean isMuffled, float maxVolume, int soundStrengh) {
+        this.sound = sound;
+        this.isMuffled = isMuffled;
+        this.maxVolume = maxVolume;
+        this.soundStrengh=soundStrengh;
+    }
+    public int getStrengh(){
+        return soundStrengh;
     }
 
     public void play() {
@@ -26,6 +38,9 @@ public class CostumeSound implements Disposable {
             float volume = isMuffled ? Math.max(0, 1 - (distance / maxVolume)) : 1;
             sound.setVolume(volume);
         }
+    }
+    public void stop(){
+        sound.stop();
     }
 
     @Override
