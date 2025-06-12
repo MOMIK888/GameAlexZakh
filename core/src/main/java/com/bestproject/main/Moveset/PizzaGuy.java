@@ -26,6 +26,8 @@ import com.bestproject.main.StaticBuffer;
 import com.bestproject.main.StaticQuickMAth;
 import com.bestproject.main.Weapons.Rocket;
 
+import box2dLight.PointLight;
+
 public class PizzaGuy  extends Moveset{
     Color[] colors; //undisposable
     public boolean jump=false;
@@ -167,7 +169,9 @@ public class PizzaGuy  extends Moveset{
             if (act==0) {
                 if (charge[0]>99) {
                     simoltanious_buttons.add(act);
-                    cd=0.18f;
+                    cd=0.3f;
+                    StaticQuickMAth.setTimeFlow(0.4f,0.3f);
+
                     ability_cooldown=0.1f;
                     //Ракета
                     current_state=2;
@@ -215,64 +219,76 @@ public class PizzaGuy  extends Moveset{
         float multiplier=1f;
         player.hitboxes[0].setHeight(1.4f);
         int current_state=player.current_state;
-        if (!player.unnormalizedMovement.isZero() && StaticBuffer.ui.getState()!=4) {
-            player.lastdir=player.lastdir.set(player.movement.x,0,player.movement.z);
-            if (current_state != 0 && StaticBuffer.ui.getState() == 0) {
-                player.current_state = 0;
-                controllers[0].setAnimation("metarig.002|walk", -1);
-                controllers[1].setAnimation("metarig.002|WalkArms",-1);
+        if (!player.unnormalizedMovement.isZero() && StaticBuffer.ui.getState() != 4 && !flying) {
+                player.lastdir = player.lastdir.set(player.movement.x, 0, player.movement.z);
+                if (current_state != 0 && StaticBuffer.ui.getState() == 0) {
+                    player.current_state = 0;
+                    controllers[0].setAnimation("metarig.002|walk", -1);
+                    controllers[1].setAnimation("metarig.002|WalkArms", -1);
+                }
+
+                Vector3 camDir = new Vector3(player.unnormalizedMovement).nor();
+                Vector3 characterForward = new Vector3(0, 0, -1);
+                Quaternion rotation = new Quaternion().setFromCross(characterForward, camDir);
+                Vector3 flatCamDir = new Vector3(-camDir.x, 0, -camDir.z).nor();
+                rotation.setFromCross(characterForward, flatCamDir);
+                modelInstance.transform.idt();
+                modelInstance.transform.rotate(rotation);
+                modelInstance.transform.scale(0.08f, 0.08f, 0.08f);
+                player.lastangle = angle;
+            } else if (StaticBuffer.ui.getState() == 0) {
+                player.speed = 1f;
+                if (current_state != 1) {
+                    player.current_state = 1;
+                }
+            }
+            if (StaticBuffer.ui.getState() == 2) {
+                if (current_state != 2) {
+                    player.current_state = 2;
+                    //ani,
+                }
+                multiplier = 2f;
+            } else if (StaticBuffer.ui.getState() == 1) {
+                if (current_state != 3) {
+                    player.current_state = 3;
+                    //anim
+                }
+            } else if (StaticBuffer.ui.getState() == 4) {
+                player.speed = 10f;
+                player.hitboxes[0].setHeight(0.1f);
+                modelInstance.transform.rotate(0, 1, 0, angle - player.lastangle);
+                player.lastangle = angle;
+                player.current_state = 4;
+            }
+            if (this.current_state == 1) {
+                if (!controllers[0].inAction) {
+                    this.current_state = 0;
+                }
+            }
+            if(flying){
+                Vector3 camDir = new Vector3(camera.direction).nor();
+                Vector3 characterForward = new Vector3(0, 0, -1);
+                Quaternion rotation = new Quaternion().setFromCross(characterForward, camDir);
+                Vector3 flatCamDir = new Vector3(-camDir.x, 0, -camDir.z).nor();
+                rotation.setFromCross(characterForward, flatCamDir);
+                modelInstance.transform.idt();
+                modelInstance.transform.rotate(rotation);
+                modelInstance.transform.scale(0.08f, 0.08f, 0.08f);
+            }
+            controllers[0].update(StaticQuickMAth.move(deltatime) * multiplier);
+            controllers[1].update(StaticQuickMAth.move(deltatime) * multiplier);
+            controllers[2].update(StaticQuickMAth.move(deltatime) * multiplier);
+            player.fractureMovement(player.movement);
+            player.movement.set(0, 0, 0);
+            player.movement.add(player.unnormalizedMovement);
+            if (player.speed > 3f) {
+                player.speed -= StaticQuickMAth.move(deltatime / 2);
+            } else {
+                player.speed += StaticQuickMAth.move(deltatime);
             }
 
-            Vector3 camDir = new Vector3(player.unnormalizedMovement).nor();
-            Vector3 characterForward = new Vector3(0, 0, -1);
-            Quaternion rotation = new Quaternion().setFromCross(characterForward, camDir);
-            Vector3 flatCamDir = new Vector3(-camDir.x, 0, -camDir.z).nor();
-            rotation.setFromCross(characterForward, flatCamDir);
-            modelInstance.transform.idt();
-            modelInstance.transform.rotate(rotation);
-            modelInstance.transform.scale(0.08f, 0.08f, 0.08f);
-            player.lastangle = angle;
-        }else if(StaticBuffer.ui.getState()==0){
-            player.speed=1f;
-            if(current_state!=1 ){
-                player.current_state=1;
-            }
-        }
-        if(StaticBuffer.ui.getState()==2){
-            if(current_state!=2){
-                player.current_state=2;
-                //ani,
-            }
-            multiplier=2f;
-        }else if(StaticBuffer.ui.getState()==1){
-            if(current_state!=3){
-                player.current_state=3;
-                //anim
-            }
-        }else if (StaticBuffer.ui.getState()==4) {
-            player.speed=10f;
-            player.hitboxes[0].setHeight(0.1f);
-            modelInstance.transform.rotate(0, 1, 0, angle - player.lastangle);
-            player.lastangle = angle;
-            player.current_state=4;
-        }
-        if(this.current_state==1){
-            if(!controllers[0].inAction){
-                this.current_state=0;
-            }
-        }
-        controllers[0].update(StaticQuickMAth.move(deltatime)*multiplier);
-        controllers[1].update(StaticQuickMAth.move(deltatime)*multiplier);
-        controllers[2].update(StaticQuickMAth.move(deltatime)*multiplier);
-        player.fractureMovement(player.movement);
-        player.movement.set(0,0,0);
-        player.movement.add(player.unnormalizedMovement);
-        if(player.speed>3f){
-            player.speed-=StaticQuickMAth.move(deltatime/2);
-        } else{
-            player.speed+=StaticQuickMAth.move(deltatime);
-        }
     }
+
 
     @Override
     public boolean OnRelease(float touchX, float touchY, int pointer) {
@@ -372,17 +388,22 @@ public class PizzaGuy  extends Moveset{
                         player.force.z = 0;
                     }
                 }
+                if (player.hitboxes[0].getBottom() < glvevel) {
+                    player.position.set(new Vector3(player.position.x, (float) (glvevel + (player.hitboxes[0].height / 2.01f)), player.position.z));
+                    player.gravity_multip = 1f;
+                    player.isGravityAffected=false;
+                    if(player.force.y<0){
+                        player.force.y = 0;
+                        isOnground=true;
+                        player.force.setZero();
+                    }
+                }
                 if (player.isGravityAffected) {
                     player.force.y -= StaticQuickMAth.getGravityAcceleration() * player.gravity_multip*8;
                     isOnground=false;
                 } else if (player.force.y < 0) {
                     player.force.y = 0;
                     isOnground=true;
-                }
-                if (player.hitboxes[0].getBottom() < glvevel) {
-                    player.position.set(new Vector3(player.position.x, (float) (glvevel + (player.hitboxes[0].height / 2.01f)), player.position.z));
-                    player.gravity_multip = 1f;
-                    player.isGravityAffected=false;
                 }
             } else {
                 if (player.force.x > 0) {
@@ -438,15 +459,28 @@ public class PizzaGuy  extends Moveset{
             player.force=elytra.getVelocity();
             player.movement.add(StaticQuickMAth.getMultipVec(player.force,StaticQuickMAth.move(GameCore.deltatime)));
             isOnground=!player.isGravityAffected;
+            current_state=10;
             if(isOnground){
                 flying=false;
                 buttons.get(4).release();
+                current_state=1;
+                if(player.force.y<0){
+                    player.force.y = 0;
+                    isOnground=true;
+                    player.force.setZero();
+                }
             }
             float glvevel = GameEngine.getGameCore().getMap().GetGroundLevel(new Vector3((float) player.hitboxes[0].x, (float) player.hitboxes[0].z, (float) player.hitboxes[0].y));
             if(player.hitboxes[0].getBottom()<glvevel+0.03){
                 flying=false;
                 isOnground=true;
                 buttons.get(4).release();
+                current_state=1;
+                if(player.force.y<0){
+                    player.force.y = 0;
+                    isOnground=true;
+                    player.force.setZero();
+                }
             }
 
         }

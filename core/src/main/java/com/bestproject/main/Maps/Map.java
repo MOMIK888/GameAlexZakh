@@ -323,7 +323,7 @@ public class Map implements Disposable {
         }
     }
     public int getUniqueIndex(){
-        return -1;
+        return mapIndex;
     }
     public void setImactFrames(float counter){
         impactFrames=counter;
@@ -380,6 +380,9 @@ public class Map implements Disposable {
         return null;
     }
     public Texture getHeightMap(){
+        return null;
+    }
+    public Texture getShadowTexture(){
         return null;
     }
 

@@ -25,6 +25,7 @@ public class FirstLoadingScreen extends LoadingScreen implements Screen {
     BitmapFont font=StaticBuffer.fonts[0];
     float w,h;
     float time=0;
+    boolean errorTexture=false;
     public FirstLoadingScreen(String[] assets, AssetManager assetManager, String[][] materials) {
         super(assets, assetManager, materials);
         batch=new SpriteBatch();
@@ -62,6 +63,8 @@ public class FirstLoadingScreen extends LoadingScreen implements Screen {
             batch.draw(frame, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             batch.end();
             drawLoading();
+        } else{
+            errorTexture=true;
         }
         if(isLoaded){
             shapeRenderer.setAutoShapeType(true);
@@ -122,7 +125,17 @@ public class FirstLoadingScreen extends LoadingScreen implements Screen {
     @Override
     public void recompile(String[] assets, AssetManager assetManager, String[][] materials) {
         super.recompile(assets, assetManager, materials);
-
+        if(errorTexture){
+            errorTexture=false;
+            videoPlayer= VideoPlayerCreator.createVideoPlayer();
+            videoPlayer.setLooping(true);
+            System.out.println("RECOMPILED!");
+            try {
+                videoPlayer.play(Gdx.files.internal("LoadingSC/rainTown.mp4"));
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override

@@ -11,6 +11,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Disposable;
 import com.bestproject.main.CostumeClasses.FPS;
 import com.bestproject.main.CostumeClasses.ImageButton;
+import com.bestproject.main.Game.GameCore;
+import com.bestproject.main.Game.GameEngine;
 import com.bestproject.main.Moveset.Moveset;
 import com.bestproject.main.Moveset.PizzaGuy;
 import com.bestproject.main.Moveset.Tp_quickMoveset;
@@ -24,24 +26,29 @@ public class UI implements Disposable {
     protected int current_moveset=0;
     protected boolean isLocked=false;
     protected ImageButton settingsButton; //disposed
+    DeathScreen deathScreen;
     Settins settins; //disposed
     protected float LMC=1f;
     boolean isLmc;
     public UI(){
+        deathScreen=new DeathScreen(StaticBuffer.fonts[0]);
         settins=new Settins();
         movesets=new ArrayList<>();
-        movesets.add(new PizzaGuy());
-        movesets.add(new PizzaGuy());
         settingsButton=new ImageButton("Images/ButtonIcons/setting_button.png",0,970,120,120);
 
     }
     public void AnalyzeLms(){
         ArrayList<Integer> aliveMovesets=new ArrayList<>();
         for(int i=0; i<movesets.size(); i++){
-            if(movesets.get(i).getLMS()){
+            if(movesets.get(i).getHp()>0){
                 aliveMovesets.add(i);
             }
         }
+        if(aliveMovesets.size()<1) {
+            GameCore.screenSpaceSim=deathScreen;
+            deathScreen.start();
+        }
+
         if(aliveMovesets.size()==1){
             movesets.get(aliveMovesets.get(0)).ActivateLms();
             current_moveset=aliveMovesets.get(0);
@@ -89,6 +96,7 @@ public class UI implements Disposable {
     }
     public void draw(SpriteBatch spriteBatch, ShapeRenderer shapeRenderer){
         shapeRenderer.setAutoShapeType(true);
+        StaticBuffer.questManager.draw(shapeRenderer,spriteBatch);
         shapeRenderer.begin();
         Gdx.gl.glEnable(GL20.GL_BLEND);
         if(StaticBuffer.getIsPaused()){
@@ -111,7 +119,6 @@ public class UI implements Disposable {
         }
         spriteBatch.end();
 
-        StaticBuffer.questManager.draw(shapeRenderer,spriteBatch);
     }
     public void Render(ModelBatch modelBatch){
     }

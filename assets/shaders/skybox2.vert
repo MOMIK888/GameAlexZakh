@@ -1,12 +1,17 @@
 attribute vec3 a_position;
 attribute vec2 a_texCoord0;
 
-uniform mat4 u_projTrans;
-uniform vec3 u_offset; // New: Translation offset
+uniform mat4 u_proj;
+uniform mat4 u_view; // rotation only — camera view matrix without translation
 
 varying vec2 v_texCoords;
 
 void main() {
     v_texCoords = a_texCoord0;
-    gl_Position = u_projTrans * vec4(a_position + u_offset, 1.0); // Apply translation
+
+    // Remove camera translation: use only rotation from view matrix
+    mat4 viewRotOnly = mat4(mat3(u_view)); // strips translation
+
+    gl_Position = u_proj * viewRotOnly * vec4(a_position, 1.0);
 }
+

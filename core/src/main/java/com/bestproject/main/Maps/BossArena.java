@@ -26,12 +26,18 @@ public class BossArena extends SingleMeshMap{
     public void MapInitialization(){
         super.MapInitialization();
         uniqueTextures=new Texture[]{new Texture(Gdx.files.internal("Images/Effect2d/light.png"))};
-        movingObjects2.add(new Player(new Vector3(8f,0.30f,8f)));
+        if(StaticBuffer.info.isLocationFetched) {
+            movingObjects2.add(new Player(new Vector3(8f,0.30f,8f)));
+        } else{
+            movingObjects2.add(new Player(StaticBuffer.info.getPlayerLocation()));
+        }
         movingObjects2.add(new Mech(new Vector3(8f,0.30f,8f)));
         skybox=new ColorFulSkybox("Models/Skyboxes/skybox2.g3dj","Models/Skyboxes/SkyboxBlue.png",4f);
         singleObjectMap.scale(0.01f,0.01f,0.01f);
         this.weatherEffector=null;
         this.weatherArea=null;
+        skybox.setCurrentTime(1);
+
     }
     @Override
     public void LoadDependencies(){

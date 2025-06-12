@@ -19,10 +19,10 @@ import java.util.ArrayList;
 public class Quest {
     ArrayList<Objective> objectives=new ArrayList<>();
     int current_objective=0;
-    String name="";
+    public String name="";
     int unique_index;
     boolean is_dest=true;
-    boolean isCompleted=false;
+    public boolean isCompleted=false;
     boolean is_init=false;
     public Quest(){
 

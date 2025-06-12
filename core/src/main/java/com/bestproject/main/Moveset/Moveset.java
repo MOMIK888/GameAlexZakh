@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 import com.bestproject.main.CharacterUtils.CharacterWidget;
@@ -23,7 +24,7 @@ import com.bestproject.main.StaticQuickMAth;
 import java.util.ArrayList;
 
 public class Moveset implements Disposable {
-    protected int charinfo=0;
+    public int charinfo=0;
     protected Model characterModel;
     protected ModelInstance modelInstance;
     protected ArrayList<ImageButton> buttons; //disposed
@@ -131,6 +132,11 @@ public class Moveset implements Disposable {
         String info=String.valueOf(hp) + "&" + String.valueOf(charge[1]);
         StaticBuffer.databaseController.updateCharacterDb(charinfo,info);
     }
+    public void reset(){
+        hp=maxHp;
+        charge[1]=0;
+
+    }
     public void button_suggestion(int index){
         simoltanious_buttons.add(index);
     }
@@ -139,7 +145,8 @@ public class Moveset implements Disposable {
     }
 
     public void setHp(float hp) {
-        this.hp = hp;
+
+        this.hp = MathUtils.clamp(hp,-100,maxHp);
         if(hp<=0){
             StaticBuffer.ui.AnalyzeLms();
         }
@@ -253,6 +260,9 @@ public class Moveset implements Disposable {
                 player.gravity_multip=1f;
             }
         }
+    }
+    public float getUltCharge(){
+        return charge[1];
     }
     public ModelInstance getModelInstance(){
         return modelInstance;

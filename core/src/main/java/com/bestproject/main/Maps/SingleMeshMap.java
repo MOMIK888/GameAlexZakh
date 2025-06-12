@@ -23,6 +23,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.Vector4;
 import com.badlogic.gdx.utils.Array;
 import com.bestproject.main.CostumeClasses.HeightBasedRect;
 import com.bestproject.main.Environment.Rain;
@@ -30,6 +31,7 @@ import com.bestproject.main.Environment.WeatherEffector;
 import com.bestproject.main.Game.GameCore;
 import com.bestproject.main.LoadScreen.LoadingScreen;
 import com.bestproject.main.MainGame;
+import com.bestproject.main.MapUtils.BasicWeatherController;
 import com.bestproject.main.MapUtils.HITBOXMAP;
 import com.bestproject.main.MapUtils.WeatherArea;
 import com.bestproject.main.MovingObjects.MovingObject;
@@ -53,6 +55,8 @@ public class SingleMeshMap extends Map{
     protected ColorFulSkybox skybox; //disposed
     public int[] player_coordinates=new int[]{0,0};
     float counterImpact=0;
+    ShaderProgram shadowMapDebugShader=new ShaderProgram(Gdx.files.internal("shaders/Debug/vertex.glsl").readString(),
+        Gdx.files.internal("shaders/Debug/fragment.glsl").readString());
     ArrayList<HeightBasedRect[]> triggerZones=new ArrayList<>();
     private Color ImpactColor=Color.WHITE;
     DirectionalShadowLight shadowLight;
@@ -61,6 +65,7 @@ public class SingleMeshMap extends Map{
     Mesh fullscreenMesh;
     ModelBatch depthModelBatch;
     FrameBuffer depthBuffer;
+    FrameBuffer shadebuffer=new FrameBuffer(Pixmap.Format.RGBA8888, (int) StaticBuffer.screenWidth, (int) screenHeight,true);
     ShaderProgram outlineShader;
     ShaderProgram toonShader;
     ShaderProgram impactShader;
@@ -71,6 +76,7 @@ public class SingleMeshMap extends Map{
     SingleObjectMap singleObjectMap;
     HITBOXMAP hitboxmap;
     Texture[] uniqueTextures;
+    BasicWeatherController basicWeatherController;
 
 
     public SingleMeshMap(int mapIndex){
@@ -131,6 +137,7 @@ public class SingleMeshMap extends Map{
         Tiles=null;
         singleObjectMap.scale(110,110,110);
         weatherEffector=new Rain();
+        basicWeatherController=new BasicWeatherController(StaticQuickMAth.time);
     }
     public void setPlayer_coordinates(int coord1, int coord2){
         player_coordinates[0]=coord1;
@@ -224,6 +231,15 @@ public class SingleMeshMap extends Map{
     }
     @Override
     public void update(int startColumn, int endColumn, int startRow, int endRow){
+        skybox.update();
+        basicWeatherController.update(StaticQuickMAth.time);
+        Color color=basicWeatherController.getSunColor();
+        Vector4 direction=basicWeatherController.getSunRayDir();
+        color.lerp(new Color(0,0,0,1f),0.7f-direction.w);
+        directionalLightEx.setColor(color.r,color.g,color.b,1f);
+        directionalLightEx.setDirection(direction.x,direction.y,direction.z);
+        shadowLight.set(directionalLightEx);
+
         skybox.setPosition(StaticBuffer.getPlayerCooordinates());
         if(weatherArea!=null) {
             weatherArea.update();
@@ -254,6 +270,7 @@ public class SingleMeshMap extends Map{
             impactFrames-=delta;
             drawImpact(camera,startColumn,endColumn,startRow,endRow);
         } else{
+
             frameBuffer.begin();
             {
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -263,8 +280,12 @@ public class SingleMeshMap extends Map{
                 Gdx.gl.glEnable(GL20.GL_BLEND);
                 Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
                 Gdx.gl.glDepthMask(true);
+                basicWeatherController.render();
+                basicWeatherController.synchSkybox(skybox);
+
                 skybox.render(camera,modelBatch);
                 modelBatch.begin(camera);
+
                 if (StaticBuffer.renderOverride != null) {
                     StaticBuffer.renderOverride.Render(null, null);
                 }
@@ -281,13 +302,6 @@ public class SingleMeshMap extends Map{
                 StaticBuffer.decalBatch.flush();
             }
             frameBuffer.end();
-            frameBuffer.getColorBufferTexture().bind(0);
-            {
-                toonShader.begin();{
-                fullscreenMesh.render(toonShader, GL20.GL_TRIANGLES);
-            }
-                toonShader.end();
-            }
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
@@ -305,10 +319,25 @@ public class SingleMeshMap extends Map{
             }
             depthBuffer.end();
         }
+        {
+            Gdx.gl.glCullFace(GL20.GL_BACK);
+            Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+            Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        }
+        environment.shadowMap=shadowLight;
         Gdx.gl.glCullFace(GL20.GL_BACK);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
         Gdx.gl.glDepthMask(true);
+        frameBuffer.getColorBufferTexture().bind(0);
+        {
+            toonShader.begin();{
+            fullscreenMesh.render(toonShader, GL20.GL_TRIANGLES);
+        }
+            toonShader.end();
+        }
         outlineShader.begin();
         depthBuffer.getTextureAttachments().get(0).bind(0);
         outlineShader.setUniformi("u_depthTexture", 0);
@@ -372,6 +401,7 @@ public class SingleMeshMap extends Map{
             depthModelBatch.end();
         }
         depthBuffer.end();
+
         Gdx.gl.glCullFace(GL20.GL_BACK);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
@@ -409,19 +439,35 @@ public class SingleMeshMap extends Map{
 
         return tmpMesh;
     }
+    @Override
+    public Texture getShadowTexture(){
+        return shadowLight.getFrameBuffer().getColorBufferTexture();
+    }
 
-    public void drawShadows(PerspectiveCamera camera,int startColumn,int endColumn,int startRow,int endRow){
-        shadowLight.begin(Vector3.Zero, camera.direction);
+    public void drawShadows(PerspectiveCamera camera){
+        Gdx.gl.glCullFace(GL20.GL_BACK);
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+        Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
+        Gdx.gl.glDepthMask(true);
+        shadowLight.getCamera().position.set(StaticBuffer.getPlayerCooordinates());
+        shadowLight.getCamera().update();
+        shadowLight.begin(camera);
         shadowBatch.begin(shadowLight.getCamera());
-        for(int m = 0; m<movingObjects.size; m++) {
+        Gdx.gl.glCullFace(GL20.GL_BACK);
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+        Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
+        Gdx.gl.glDepthMask(true);
+        for(int m = 0; m<movingObjects2.size; m++) {
             movingObjects2.get(m).render(shadowBatch);
         }
         for(int m = 0; m< staticObjects2.size; m++) {
             staticObjects2.get(m).render(shadowBatch);
         }
-        singleObjectMap.render(shadowBatch);
+        singleObjectMap.render(shadowBatch,environment);
         shadowBatch.end();
         shadowLight.end();
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
     }
     @Override
     public void impact_frame(int startCol, int endCol,int startRow, int endRow) {

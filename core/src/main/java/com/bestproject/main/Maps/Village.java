@@ -32,11 +32,16 @@ public class Village extends SingleMeshMap{
     public void MapInitialization(){
         super.MapInitialization();
         uniqueTextures=new Texture[]{new Texture(Gdx.files.internal("Images/Effect2d/light.png"))};
-        movingObjects2.add(new Player(new Vector3(0f,0.30f,8f)));
+        if(StaticBuffer.info.isLocationFetched) {
+            movingObjects2.add(new Player(new Vector3(0f, 0.30f, 8f)));
+        } else{
+            movingObjects2.add(new Player(StaticBuffer.info.getPlayerLocation()));
+        }
         staticObjects2.add(new StaticEffect(new Vector3(0.93f,1.4f, 6.790546f),uniqueTextures[0],1,1,0.5f));
         triggerZones.add(new HeightBasedRect[]{new HeightBasedRect(new Rectangle(0.63f,6.6f,0.6f,0.4f),4f,0)});
         staticObjects2.add(new FastTravel(StaticBuffer.Testmodel, new Vector3(0.93f,0f, 10.790546f)));
         skybox=new ColorFulSkybox("Models/Skyboxes/skybox2.g3dj","Models/Skyboxes/SkyboxBlue.png",4f);
+        skybox.setCurrentTime(1);
     }
     @Override
     public void LoadDependencies(){

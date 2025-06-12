@@ -4,12 +4,14 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.bestproject.main.CharacterUtils.Item;
+import com.bestproject.main.Main;
+import com.bestproject.main.MainGame;
 
 public class Inventory {
-    Array<Item> items;
+    Array<Item> items=new Array<>();
     Texture[] temptextureBuffer;
-    public Inventory(String uncodedInfo){
-        items=decipherItems(uncodedInfo);
+    public Inventory(){
+
     }
     public Array<Item> decipherItems(String info){
         if(info==null || info.isEmpty()){
@@ -40,7 +42,31 @@ public class Inventory {
             info+="^";
             finalInfo+=info;
         }
+        MainGame.databaseInterface[2].setInfo(2,finalInfo);
         return finalInfo;
+    }
+    public void decipher(String info) {
+        if(info==null || info.isEmpty() || info.length()<1){
+            return;
+        }
+        items.clear();
+        String[] itemEntries = info.split("\\^");
+        for (String entry : itemEntries) {
+            if (entry.isEmpty()) {
+                continue;
+            }
+            String[] components = entry.split("\\$");
+            if (components.length >= 3) {
+                try {
+                    int uniqueIndex = Integer.parseInt(components[0]);
+                    int quantity = Integer.parseInt(components[1]);
+                    String name = components[2];
+                    items.add(new Item(uniqueIndex, quantity, name));
+                } catch (NumberFormatException e) {
+                    System.err.println("" + entry);
+                }
+            }
+        }
     }
     public boolean checkSubtraction(int uniqueIndex, int amount){
         boolean ans=false;

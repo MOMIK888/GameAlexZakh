@@ -49,10 +49,16 @@ import com.bestproject.main.Quests.QuestManager;
 import com.bestproject.main.RenderOverride.RenderOverride;
 import com.bestproject.main.SoundManagement.CostumeSound;
 import com.bestproject.main.SoundManagement.SoundManager;
+import com.bestproject.main.UiParts.CompiledInfo;
+import com.bestproject.main.UiParts.Inventory;
 
 import java.util.ArrayList;
 
 public class StaticBuffer implements Disposable {
+    public static int coins=0;
+    public static BitmapFont[] fonts=new BitmapFont[]{new BitmapFont(Gdx.files.internal("Fonts/hinyu.fnt"), Gdx.files.internal("Fonts/hinyu.png"),false)}; //disposed
+    public static Inventory inventory=new Inventory();
+    public static CompiledInfo info=new CompiledInfo(true);
     public static Model Testmodel=createSimpleCube();
     public static DatabaseController databaseController=new DatabaseController();
     public static CreativeMode creativeMode=new CreativeMode();
@@ -63,7 +69,6 @@ public class StaticBuffer implements Disposable {
     public static SpriteSheetDecal warning=new SpriteSheetDecal(new Texture("Images/Effect2d/hit.png"),5,2,0.03f,0.01f); //disposed
     public static SpriteSheetDecal warningRed=new SpriteSheetDecal(new Texture("Images/Effect2d/redWarn.png"),4,4,0.03f,0.01f); //disposed
     public static SpriteSheetDecal dust=new SpriteSheetDecal(new Texture("Images/Effect2d/dust2.png"),8,5,0.005f,0.01f); //disposed
-    public static BitmapFont[] fonts=new BitmapFont[]{new BitmapFont(Gdx.files.internal("Fonts/hinyu.fnt"), Gdx.files.internal("Fonts/hinyu.png"),false)}; //disposed
     //disposed
     static boolean isPaused, isLoading=false;
     public static GradientDecalWarning warn=new GradientDecalWarning(new Color(1f,0f,0f,0.6f),Color.RED); //disposed
@@ -136,8 +141,73 @@ public class StaticBuffer implements Disposable {
     public static ModelInstance getEffectfromBuffer(int index){
         return new ModelInstance(EffectBuffer.get(index));
     }
-    public static void saveAllValues(){
+    public static void loadAllValues(String data) {
+        if(data==null || data.isEmpty() || data.length()<1){
+            info.setDefault();
+            return;
+        }else {
+            String[] sections = data.split("\\^");
+            String[] coords = sections[0].split("\\$");
+            info.creationLocation = new Vector3(
+                Float.parseFloat(coords[0]),
+                Float.parseFloat(coords[1]),
+                Float.parseFloat(coords[2])
+            );
+            String[] movesetsRaw = sections[1].split("&");
+            int count = movesetsRaw.length;
+            info.movesetshp = new float[count];
+            info.movesets = new int[count];
+            info.movesetUltCharge = new float[count];
 
+            for (int i = 0; i < count; i++) {
+                if (movesetsRaw[i].isEmpty()) continue;
+                String[] parts = movesetsRaw[i].split("\\$");
+                info.movesetshp[i] = Float.parseFloat(parts[0]);
+                info.movesets[i] = Integer.parseInt(parts[1]);
+                info.movesetUltCharge[i] = Float.parseFloat(parts[2]);
+            }
+            info.mapIndex = Integer.parseInt(sections[2]);
+            info.time = Float.parseFloat(sections[3]);
+        }
+    }
+    public static void saveAllValues(){
+        savePlayer();
+    }
+    public static void savePlayer(){
+        String string="";
+        string+=getPlayerCooordinates().x+"$"+getPlayerCooordinates().y+"$"+getPlayerCooordinates().z+"^";
+        String movesetsInfo="";
+        for(int i=0; i<ui.movesets.size(); i++){
+            movesetsInfo+=ui.movesets.get(i).getHp();
+            movesetsInfo+="$";
+            movesetsInfo+=ui.movesets.get(i).charinfo;
+            movesetsInfo+="$";
+            movesetsInfo+=ui.movesets.get(i).getUltCharge();
+            movesetsInfo+="&";
+        }
+        string+=movesetsInfo;
+        string+="^";
+        string+=GameEngine.getGameCore().getMap().mapIndex;
+        string+="^";
+        string+=StaticQuickMAth.time;
+        if(MainGame.databaseInterface[2].getInfo(0)==null) {
+            MainGame.databaseInterface[2].setInfo(0, "");
+            MainGame.databaseInterface[2].setInfo(0, string);
+        } else{
+            MainGame.databaseInterface[2].setInfo(0, string);
+        }
+        if(MainGame.databaseInterface[2].getInfo(1)==null) {
+            MainGame.databaseInterface[2].setInfo(1, "");
+            MainGame.databaseInterface[2].setInfo(1, questManager.cipherQuestData());
+        } else{
+            MainGame.databaseInterface[2].setInfo(1, questManager.cipherQuestData());
+        }
+        if(MainGame.databaseInterface[2].getInfo(2)==null) {
+            MainGame.databaseInterface[2].setInfo(2, "");
+            inventory.codeInfo();
+        } else{
+            inventory.codeInfo();
+        }
     }
     public static void disposeAll() {
         soundManager.dispose();
@@ -166,6 +236,9 @@ public class StaticBuffer implements Disposable {
         warning.dispose();
         warn.dispose();
         dust.dispose();
+    }
+    public static void saveQuests(){
+
     }
     public static float getDistance(float x1, float y1, float x2, float y2){
         float dx = x2 - x1;

@@ -17,8 +17,10 @@ public class Settins implements Disposable {
     Color[] colors;
     protected float frames, maxframes;
     protected Rectangle menurect;
+    QuestingUi questingUi;
     private ImageButton[] Buttons;
     private Texture[] sprites;
+    boolean isQuesting=false;
     public Settins(){
         height=Gdx.graphics.getHeight();
         width= Gdx.graphics.getWidth() /12;
@@ -30,6 +32,7 @@ public class Settins implements Disposable {
         sprites=new Texture[]{new Texture("Images/Ui/coin.png")};
         colors=new Color[]{StaticBuffer.choice_colors[0],StaticBuffer.choice_colors[1]};
         frames=0;
+        questingUi=new QuestingUi(StaticBuffer.fonts[0],StaticBuffer.questManager);
         maxframes=0.2f;
         menurect=new Rectangle(-(width),Gdx.graphics.getHeight(),width,height);
 
@@ -57,6 +60,11 @@ public class Settins implements Disposable {
         for(int i=0; i<Buttons.length; i++){
             Buttons[i].draw(spriteBatch, 0.6f);
         }
+        if(isQuesting){
+            StaticBuffer.TestShapeRenderer.begin();
+            questingUi.render(spriteBatch,StaticBuffer.TestShapeRenderer,StaticBuffer.questManager);
+            StaticBuffer.TestShapeRenderer.end();
+        }
     }
     public void reset(){
         frames=0;
@@ -67,10 +75,12 @@ public class Settins implements Disposable {
             if(Buttons[i].onTouch(touchx,touchy, pointer)){
                 if((i)==0){
                     reset();
-                } if((i==3)){
-                    StaticBuffer.saveAllValues();
-                    System.exit(0);
-                } if(i==4){
+                } else if(i==1) {
+                    isQuesting=true;
+                }else if((i==3)){
+                        StaticBuffer.saveAllValues();
+                        System.exit(0);
+                } else if(i==4){
                     StaticBuffer.EnableCREATIVE();
                 }
                 return true;

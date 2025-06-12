@@ -1,11 +1,15 @@
 package com.bestproject.main.Weapons;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.math.Vector3;
 import com.bestproject.main.Attacks.Attack;
+import com.bestproject.main.CostumeClasses.SpriteSheet;
 import com.bestproject.main.Game.GameCore;
 import com.bestproject.main.Game.GameEngine;
 import com.bestproject.main.ObjectFragment.ATKHITBOX;
@@ -19,9 +23,12 @@ public class Rocket extends Attack {
     float speed=4f;
     float explodeLengh=0.3f;
     boolean exploding=false;
+    static SpriteSheet spriteSheet;
     Vector3 direction;
     public Rocket(Model model, Vector3 position, float scale, float[] flingdir) {
+
         super(new ModelInstance(model), position);
+        spriteSheet=new SpriteSheet(new Texture(Gdx.files.internal("Images/Effect2d/Explosion.png")),4,3);
         hitboxes=new ATKHITBOX[]{new ATKHITBOX(position,0.3f*scale,1f,new float[]{10f*scale,10f*scale,10f*scale},true)};
         hitboxes[0].setCrit_multiplier(1.5f);
         direction=new Vector3(flingdir[0],flingdir[1],flingdir[2]);
@@ -29,6 +36,15 @@ public class Rocket extends Attack {
         lengh=4f;
         setPosition(position);
 
+    }
+    @Override
+    public void setPosition(Vector3 vector3){
+        super.setPosition(vector3);
+        for(int i=0; i<hitboxes.length; i++) {
+            hitboxes[i].setZ(position.y);
+            hitboxes[i].setY(position.z);
+            hitboxes[i].setX(position.x);
+        }
     }
     public Rocket(Model model, Vector3 position, float scale, float[] flingdir, boolean isStatic) {
         super(new ModelInstance(model), position);
@@ -64,6 +80,7 @@ public class Rocket extends Attack {
             GameEngine.getGameCore().getMap().ForcedHitboxInterraction(this);
             Vector3 previos_position=new Vector3(position);
             setPosition(new Vector3(movement.x+position.x,position.y+movement.y,movement.z+position.z));
+            GameEngine.getGameCore().getMap().ForcedHitboxInterraction(this);
             hitboxes[0].setZ(position.y);
             hitboxes[0].setY(position.z);
             hitboxes[0].setX(position.x);
@@ -76,6 +93,7 @@ public class Rocket extends Attack {
         GameEngine.getGameCore().getMap().ForcedHitboxInterraction(this);
         Vector3 previos_position=new Vector3(position);
         setPosition(new Vector3(movement.x+position.x,position.y+movement.y,movement.z+position.z));
+        GameEngine.getGameCore().getMap().ForcedHitboxInterraction(this);
         GameEngine.getGameCore().getMap().ForcedMovingRearr(previos_position);
 
     }
@@ -90,7 +108,7 @@ public class Rocket extends Attack {
         }};
         hitboxes[0].setForce(10);
         hitboxes[1].setForce(20);
-        hitboxes[0].setStunframes(10f);
+        hitboxes[0].setStunframes(1.3f);
         direction=new Vector3(flingdir);
         StaticQuickMAth.normalizeSpeed(direction);
         lengh=4f;
@@ -106,9 +124,10 @@ public class Rocket extends Attack {
         lengh-=StaticQuickMAth.move(GameCore.deltatime);
         if(!exploding) {
             fractureMovement(new Vector3(StaticQuickMAth.move(speed * direction.x * GameCore.deltatime), StaticQuickMAth.move(speed * direction.y * GameCore.deltatime), StaticQuickMAth.move(speed * direction.z * GameCore.deltatime)));
+        } else{
+            fractureMovement(new Vector3());
         }
         movement.set(0,0f,0);
-        fractureMovement(new Vector3());
         if(exploding){
             explodeLengh-=StaticQuickMAth.move(GameCore.deltatime);
             hitboxes[0].width=3-explodeLengh*8;
@@ -132,20 +151,31 @@ public class Rocket extends Attack {
     public void HITBOXINTERRACTION(HITBOX[] hitboxes) {
         if(hitboxes!=null){
             for(int i=0; i<hitboxes.length; i++){
-                if(hitboxes[i].colliderectangles(this.hitboxes[0])){
+                if((this.hitboxes[0].colliderectangles(hitboxes[i]))){
                     explode();
                 }
 
             }
         }
-        if(this.hitboxes[0].getBottom()<GameEngine.getGameCore().getMap().GetGroundLevel(this.getPosition())){
+        if(this.hitboxes[0].getBottom()<0){
             explode();
         }
     }
 
     @Override
     public void render(ModelBatch modelBatch, Environment environment) {
-        super.render(modelBatch, environment);
+        if(!exploding){
+            super.render(modelBatch,environment);
+        } else{
+            int numFrame=(int)((float)spriteSheet.getNumFrames()/0.3f*(0.3f-explodeLengh));
+
+            Decal decal=Decal.newDecal(spriteSheet.getFrame(numFrame),true);
+            float dimPlus=(0.15f-explodeLengh)*-14;
+            decal.setDimensions(4+dimPlus,4+dimPlus);
+            decal.setPosition(this.position);
+            decal.lookAt(GameCore.camera.position,Vector3.Y);
+            StaticBuffer.decalBatch.add(decal);
+        }
     }
 
     public void explode(){

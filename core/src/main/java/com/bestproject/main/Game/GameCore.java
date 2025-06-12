@@ -116,6 +116,7 @@ public class GameCore implements Disposable, InputProcessor {
             if(!StaticBuffer.isIsLoading()){
                 map.MapInitialization();
                 loadingScreen.dispose();
+                StaticBuffer.savePlayer();
             }
             return false;
         }
@@ -173,17 +174,17 @@ public class GameCore implements Disposable, InputProcessor {
             if(TemporaryMapBuffer==0){
                 map=new Tavern();
             } else if(TemporaryMapBuffer==1){
-                if(map.getUniqueIndex()!=0) {
                     map = new Village();
-                }
-            } else if(TemporaryMapBuffer==2){
-                if(map.getUniqueIndex()!=3) {
-                    map = new BossArena();
-                }
+            } else if(TemporaryMapBuffer==3){
+                map = new BossArena();
             }
             TemporaryMapBuffer=-1;
         }
         StaticBuffer.spriteBatch.begin();
+
+        if(map.getShadowTexture()!=null){
+            spriteBatch.draw(map.getShadowTexture(),0,screenHeight, screenWidth, -screenHeight);
+        }
         if(screenSpaceSim!=null){
             screenSpaceSim.render(spriteBatch);
             screenSpaceSim.update(deltatime);

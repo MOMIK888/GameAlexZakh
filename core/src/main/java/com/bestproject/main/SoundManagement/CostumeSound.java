@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 
 public class CostumeSound implements Disposable {
-    private final Music sound;
+    public final Music sound;
     private final boolean isMuffled;
     private final float maxVolume;
     private long soundId;

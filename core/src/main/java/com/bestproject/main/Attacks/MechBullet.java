@@ -16,12 +16,12 @@ import com.bestproject.main.StaticBuffer;
 import com.bestproject.main.StaticQuickMAth;
 
 public class MechBullet extends Attack {
-    float speed=10f;
+    float speed=40f;
     Vector3 sincos;
     ATKHITBOX[] hitboxes;
     Decal deeeecal;
     Decal trail;
-    float maxlengh=1f;
+    float maxlengh=0.25f;
     public MechBullet(Vector3 position, float[] flingdir, TextureRegion txt) {
         super(null, position);
         movement=new Vector3();

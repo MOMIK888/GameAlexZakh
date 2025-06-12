@@ -70,7 +70,7 @@ public class StaticQuickMAth {
         counter = cnt;
     }
     public static void updateTime(){
-        time+=0.005f*TimeMultiplier;
+        time+=0.05f*TimeMultiplier*GameCore.deltatime;
         time=time%24;
         setTimeFlow(1f, 0);
         counter-= GameEngine.getGameCore().deltatime;

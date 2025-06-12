@@ -47,7 +47,7 @@ public class MapQuickTravel implements ScreenEmulator {
                     GameEngine.getGameCore().displayQuickTravel=false;
                     GameEngine.gameCore.DecalButtonTiring=1;
                     if(i==0){
-                        GameCore.TemporaryMapBuffer=2;
+                        GameCore.TemporaryMapBuffer=3;
                     } else{
                         GameCore.TemporaryMapBuffer=1;
                     }
